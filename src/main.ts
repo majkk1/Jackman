@@ -60,13 +60,13 @@ enum PlayerState {
 
 class PlayerController extends ECS.Component {
 
-	readonly GRAVITY = 0.003;
+	readonly GRAVITY = 0.001;
 
 	readonly EPSILON = 1e-2;
 
 	readonly PLAYER_WALK_SPEED = 0.15;
-	readonly PLAYER_JUMP_SIZE = 0.3;
-	readonly JUMP_TRESHOLD = 200;
+	readonly PLAYER_JUMP_SIZE = 0.25;
+	readonly JUMP_TRESHOLD = 150;
 
 	onInit() {
 		this.setspeed(new Vector2(0, 0));
@@ -121,86 +121,81 @@ class PlayerController extends ECS.Component {
 		//horizontal movement
 		let speed = this.getspeed();
 
-		// save previous coords
-		const oldX = this.owner.position.x;
-		const oldY = this.owner.position.y;
+		//if no movement
+		if(speed.x == 0 && speed.y == 0) return;
 
-		//VERTICAL COLLISION
+
+		// save previous coords
+		let oldX = this.owner.position.x;
+		let oldY = this.owner.position.y;
+
+
+		this.owner.position.x += speed.x;
 		this.owner.position.y += speed.y;
+
 
 		//check for collision with grounds
 		const grounds = this.scene.findObjectsByTag(Tags.GROUND);
-		let playerBox = this.owner.getBounds();
 
-		console.log('jsem na zemi?', this.getonGround(), speed.y);
+		console.log('Col func start, on ground:', this.getonGround(), ', speed: ', speed);
 
 		for (let colider of grounds) {
+			let playerBox = this.owner.getBounds();
 			const cBox = colider.getBounds();
 
-			const horizIntersection = this.horizIntersection(playerBox, cBox);
-			const verIntersection = this.verIntersection(playerBox, cBox);
+			//solve vertical collision
+			let horizIntersection = this.horizIntersection(playerBox, cBox);
+			let verIntersection = this.verIntersection(playerBox, cBox);
 
-			const collides = (horizIntersection > 0 && verIntersection > 0);
+			let collides = (horizIntersection > 0 && verIntersection > 0);
 
 			if (collides) {
-				console.log('doslo k vertikální kolizi');
-				if (verIntersection > 0) {
-					//collision under player
-					if (speed.y > 0) {
-						this.owner.y = Math.ceil(oldY + cBox.top - playerBox.bottom);
-						speed.y = 0;
-						this.setonGround(true);
-						console.log('col down', cBox.top, playerBox.bottom);
-					}
+				console.log('playerCbox: ', playerBox, ' cbox: ', cBox);
+				//collision under player
+				if (speed.y > 0 && !this.getonGround()) {
+					this.owner.y = oldY + (speed.y - verIntersection);
+					speed.y = 0;
+					this.setonGround(true);
+					console.log('Collision down, verInt: ', verIntersection);
+				}
 
-					//collision below player
-					if (speed.y < 0) {
-						this.owner.y = Math.floor(oldY - playerBox.top + cBox.bottom);
-						speed.y = 0;
-						this.setJumpTime(0);
-						console.log('col up', cBox.bottom, playerBox.top);
-					}
+				//collision below player
+				if (speed.y < 0) {
+					this.owner.y = oldY + (speed.y + verIntersection);
+					speed.y = 0;
+					this.setJumpTime(0);
+					console.log('Collision up, verInt: ', verIntersection);
+				}
+			}
+			// speed.y *= 0.8;
+			// if (Math.abs(speed.y) < this.EPSILON) speed.y = 0;
+
+			horizIntersection = this.horizIntersection(playerBox, cBox);
+			verIntersection = this.verIntersection(playerBox, cBox);
+			
+			//solve horizontal collision
+			collides = (horizIntersection > 0 && verIntersection > 0.8);
+			if (collides) {
+				//collision right to the player
+				if (speed.x > 0) {
+					this.owner.x = oldX + (speed.x - horizIntersection);
+					speed.x = 0;
+					console.log('Collision right, horizInt: ', horizIntersection);
+				}
+
+				//collision left to the player
+				if (speed.x < 0) {
+					this.owner.x = oldX + (speed.x + horizIntersection);
+					speed.x = 0;
+					console.log('Collision left, horizInt: ', horizIntersection);
 				}
 			}
 		}
+		speed.x = 0;
 
 
-
-		//HORIZONTAL COLISION
-		this.owner.position.x += speed.x;
-		playerBox = this.owner.getBounds();
-		for (let colider of grounds) {
-			const cBox = colider.getBounds();
-
-			const horizIntersection = this.horizIntersection(playerBox, cBox);
-			const verIntersection = this.verIntersection(playerBox, cBox);
-
-			const collides = (horizIntersection > 0 && verIntersection > 0);
-
-			if (collides) {
-
-				if (horizIntersection > 0) {
-					//collision right to the player
-					if (speed.x > 0) {
-						this.owner.x = Math.ceil(oldX + cBox.left - playerBox.right);
-						console.log('col right', cBox.left, playerBox.right);
-					}
-
-					//collision left to the player
-					else if (speed.x < 0) {
-						this.owner.x = Math.floor(oldX - playerBox.left + cBox.right);
-						console.log('col left', cBox.right, playerBox.left);
-					}
-				}
-			}
-		}
-
-		speed.x *= 0.7;
-		if (speed.x < this.EPSILON) speed.x = 0;
-
-		speed.y *= 0.9;
-		if (speed.y < this.EPSILON) speed.y = 0;
-
+		// speed.x *= 0.8;
+		// if (Math.abs(speed.x) < this.EPSILON) speed.x = 0;
 
 		//save changes
 		this.setspeed(speed);
@@ -214,38 +209,38 @@ class PlayerController extends ECS.Component {
 
 		let playerState = this.getplayerState();
 
-		console.log('state: ', playerState);
+		// console.log('state: ', playerState);
 
 		switch (playerState) {
 			case PlayerState.STAND:
 				//if left or right arrow but not both -> goto WALK state
-				if (!(keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT))) {
-					if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) || keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
+				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) || keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
+					if (!(keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT))) {
 						playerState = PlayerState.WALK;
 					}
 				}
-
-				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_SPACE)) {
+				//if space -> goto JUMP
+				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_SPACE)) {
 					playerState = PlayerState.JUMP;
 				}
 				break;
 
 			case PlayerState.WALK:
+				//space pushed -> goto JUMP
 				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_SPACE)) {
 					playerState = PlayerState.JUMP;
 				}
 				//move left
 				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
 					speed.x = Math.max(-this.PLAYER_WALK_SPEED * delta, -this.PLAYER_WALK_SPEED);
-					console.log('GO LEFT', speed.x);
 					this.setonGround(false);
 				}
 				//move right
 				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT)) {
 					speed.x = Math.min(this.PLAYER_WALK_SPEED * delta, this.PLAYER_WALK_SPEED);
-					console.log('GO RIGHT', speed.x);
 					this.setonGround(false);
 				}
+				//nothing happened
 				else {
 					playerState = PlayerState.STAND;
 				}
@@ -256,12 +251,10 @@ class PlayerController extends ECS.Component {
 				//move left
 				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
 					speed.x = Math.max(-this.PLAYER_WALK_SPEED * delta, -this.PLAYER_WALK_SPEED);
-					console.log('GO LEFT', speed.x);
 				}
 				//move right
 				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT)) {
 					speed.x = Math.min(this.PLAYER_WALK_SPEED * delta, this.PLAYER_WALK_SPEED);
-					console.log('GO RIGHT', speed.x);
 				}
 				//jump
 				let jumpTime = this.getJumpTime();
@@ -275,7 +268,7 @@ class PlayerController extends ECS.Component {
 					if (jumpTime >= 0 && absolute - jumpTime < this.JUMP_TRESHOLD) {
 						this.setonGround(false);
 						console.log('doin jump');
-						speed.y += Math.max(-this.PLAYER_JUMP_SIZE * delta, -this.PLAYER_JUMP_SIZE);
+						speed.y = Math.max(-this.PLAYER_JUMP_SIZE * delta, -this.PLAYER_JUMP_SIZE);
 					}
 					else {
 						this.setJumpTime(0);
@@ -288,13 +281,15 @@ class PlayerController extends ECS.Component {
 					this.setJumpTime(0);
 				}
 				//no jump if on the ground
-				if (this.getonGround()) {
+				if (this.getonGround() && this.getJumpTime() == 0) {
 					playerState = PlayerState.STAND;
 					console.log('jump end');
 				}
 				console.log('jmp, speed y: ', speed.y)
 				break;
 		}
+
+		// this.applyMovement(); //apply physics
 
 		if (!this.getonGround()) {
 			//add gravity
@@ -303,7 +298,7 @@ class PlayerController extends ECS.Component {
 			}
 		}
 
-		console.log('speed after gravity, speed y: ', speed.y)
+		// console.log('speed after gravity, speed y: ', speed.y)
 
 
 		//save changes
@@ -357,7 +352,7 @@ class MyGame {
 			ground.addChild(sprite);
 		}
 
-		for (let i = 0; i < Math.floor(2*SCENE_WIDTH/3); i++) {
+		for (let i = 0; i < Math.floor(2 * SCENE_WIDTH / 3); i++) {
 			let sprite = new ECS.Sprite('', this.createTexture(0, 0, 32, 32));
 			sprite.scale.set(TEXTURE_SCALE);
 			sprite.position.x = i;
@@ -366,7 +361,7 @@ class MyGame {
 			ground.addChild(sprite);
 		}
 
-		for (let i = Math.ceil(3*SCENE_WIDTH/4); i < SCENE_WIDTH; i++) {
+		for (let i = Math.ceil(3 * SCENE_WIDTH / 4); i < SCENE_WIDTH; i++) {
 			let sprite = new ECS.Sprite('', this.createTexture(0, 0, 32, 32));
 			sprite.scale.set(TEXTURE_SCALE);
 			sprite.position.x = i;
@@ -375,7 +370,7 @@ class MyGame {
 			ground.addChild(sprite);
 		}
 
-		for (let i = Math.ceil(SCENE_WIDTH/4); i < Math.ceil(3*SCENE_WIDTH/4); i++) {
+		for (let i = Math.ceil(SCENE_WIDTH / 4); i < Math.ceil(3 * SCENE_WIDTH / 4); i++) {
 			let sprite = new ECS.Sprite('', this.createTexture(0, 0, 32, 32));
 			sprite.scale.set(TEXTURE_SCALE);
 			sprite.position.x = i;
@@ -412,9 +407,6 @@ class MyGame {
 			.withAttribute('playerState', PlayerState.STAND)
 			.scale(TEXTURE_SCALE)
 			.build();
-
-		console.log("Load done")
-
 
 	}
 
