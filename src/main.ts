@@ -64,7 +64,7 @@ class PlayerController extends ECS.Component {
 
 	readonly EPSILON = 1e-2;
 
-	readonly PLAYER_WALK_SPEED = 0.2;
+	readonly PLAYER_WALK_SPEED = 0.15;
 	readonly PLAYER_JUMP_SIZE = 0.3;
 	readonly JUMP_TRESHOLD = 200;
 
@@ -155,7 +155,9 @@ class PlayerController extends ECS.Component {
 
 					//collision below player
 					if (speed.y < 0) {
-						this.owner.y = Math.floor(oldY - playerBox.top - cBox.bottom);
+						this.owner.y = Math.floor(oldY - playerBox.top + cBox.bottom);
+						speed.y = 0;
+						this.setJumpTime(0);
 						console.log('col up', cBox.bottom, playerBox.top);
 					}
 				}
@@ -297,7 +299,7 @@ class PlayerController extends ECS.Component {
 		if (!this.getonGround()) {
 			//add gravity
 			if (!this.getonGround()) {
-				speed.y += Math.max(this.GRAVITY * delta, this.GRAVITY;
+				speed.y += Math.max(this.GRAVITY * delta, this.GRAVITY);
 			}
 		}
 
@@ -355,12 +357,32 @@ class MyGame {
 			ground.addChild(sprite);
 		}
 
-		let sprite = new ECS.Sprite('', this.createTexture(0, 0, 32, 32));
-		sprite.scale.set(TEXTURE_SCALE);
-		sprite.position.x = 14;
-		sprite.position.y = sceneHeight - 2;
-		sprite.addTag(Tags.GROUND);
-		ground.addChild(sprite);
+		for (let i = 0; i < Math.floor(2*SCENE_WIDTH/3); i++) {
+			let sprite = new ECS.Sprite('', this.createTexture(0, 0, 32, 32));
+			sprite.scale.set(TEXTURE_SCALE);
+			sprite.position.x = i;
+			sprite.position.y = sceneHeight - 5;
+			sprite.addTag(Tags.GROUND);
+			ground.addChild(sprite);
+		}
+
+		for (let i = Math.ceil(3*SCENE_WIDTH/4); i < SCENE_WIDTH; i++) {
+			let sprite = new ECS.Sprite('', this.createTexture(0, 0, 32, 32));
+			sprite.scale.set(TEXTURE_SCALE);
+			sprite.position.x = i;
+			sprite.position.y = sceneHeight - 8;
+			sprite.addTag(Tags.GROUND);
+			ground.addChild(sprite);
+		}
+
+		for (let i = Math.ceil(SCENE_WIDTH/4); i < Math.ceil(3*SCENE_WIDTH/4); i++) {
+			let sprite = new ECS.Sprite('', this.createTexture(0, 0, 32, 32));
+			sprite.scale.set(TEXTURE_SCALE);
+			sprite.position.x = i;
+			sprite.position.y = sceneHeight - 11;
+			sprite.addTag(Tags.GROUND);
+			ground.addChild(sprite);
+		}
 
 		let sprite2 = new ECS.Sprite('', this.createTexture(0, 0, 32, 32));
 		sprite2.scale.set(TEXTURE_SCALE);
@@ -368,6 +390,13 @@ class MyGame {
 		sprite2.position.y = sceneHeight - 2;
 		sprite2.addTag(Tags.GROUND);
 		ground.addChild(sprite2);
+
+		let sprite = new ECS.Sprite('', this.createTexture(0, 0, 32, 32));
+		sprite.scale.set(TEXTURE_SCALE);
+		sprite.position.x = 14;
+		sprite.position.y = sceneHeight - 2;
+		sprite.addTag(Tags.GROUND);
+		ground.addChild(sprite);
 
 		//add player
 		new ECS.Builder(this.engine.scene)
