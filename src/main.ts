@@ -60,13 +60,13 @@ enum PlayerState {
 
 class PlayerController extends ECS.Component {
 
-	readonly GRAVITY = 0.001;
+	readonly GRAVITY = 0.003;
 
 	readonly EPSILON = 1e-2;
 
-	readonly PLAYER_WALK_SPEED = 0.1;
-	readonly PLAYER_JUMP_SIZE = 0.1;
-	readonly JUMP_TRESHOLD = 250;
+	readonly PLAYER_WALK_SPEED = 0.2;
+	readonly PLAYER_JUMP_SIZE = 0.3;
+	readonly JUMP_TRESHOLD = 200;
 
 	onInit() {
 		this.setspeed(new Vector2(0, 0));
@@ -102,6 +102,13 @@ class PlayerController extends ECS.Component {
 		this.owner.assignAttribute('onGround', flag);
 	}
 
+	getplayerState() {
+		return this.owner.getAttribute<PlayerState>('playerState');
+	}
+	setplayerState(state: PlayerState) {
+		this.owner.assignAttribute('playerState', state);
+	}
+
 	private horizIntersection(boundsA: PIXI.Rectangle, boundsB: PIXI.Rectangle) {
 		return Math.min(boundsA.right, boundsB.right) - Math.max(boundsA.left, boundsB.left);
 	}
@@ -125,7 +132,7 @@ class PlayerController extends ECS.Component {
 		const grounds = this.scene.findObjectsByTag(Tags.GROUND);
 		let playerBox = this.owner.getBounds();
 
-		console.log('JUMP SPEED: ', speed.y);
+		console.log('jsem na zemi?', this.getonGround(), speed.y);
 
 		for (let colider of grounds) {
 			const cBox = colider.getBounds();
@@ -136,11 +143,12 @@ class PlayerController extends ECS.Component {
 			const collides = (horizIntersection > 0 && verIntersection > 0);
 
 			if (collides) {
-
+				console.log('doslo k vertikální kolizi');
 				if (verIntersection > 0) {
 					//collision under player
 					if (speed.y > 0) {
 						this.owner.y = Math.ceil(oldY + cBox.top - playerBox.bottom);
+						speed.y = 0;
 						this.setonGround(true);
 						console.log('col down', cBox.top, playerBox.bottom);
 					}
@@ -202,50 +210,102 @@ class PlayerController extends ECS.Component {
 		let speed = this.getspeed();
 		let wasMoved = false
 
-		//move left
-		if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
-			speed.x = Math.max(-this.PLAYER_WALK_SPEED * delta, -this.PLAYER_WALK_SPEED);
-			console.log('GO LEFT', speed.x);
-			wasMoved=true;
-		}
+		let playerState = this.getplayerState();
 
-		//move right
-		else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT)) {
+		console.log('state: ', playerState);
 
-			speed.x = Math.min(this.PLAYER_WALK_SPEED * delta, this.PLAYER_WALK_SPEED);
-			console.log('GO RIGHT', speed.x);
-			this.setonGround(false);
-			wasMoved=true;
-		}
-
-
-		//jump
-		const jumpTime = this.getJumpTime();
-		if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_SPACE)) {
-			if (this.getonGround()) {
-				if (jumpTime == 0) {
-					this.setJumpTime(absolute);
+		switch (playerState) {
+			case PlayerState.STAND:
+				//if left or right arrow but not both -> goto WALK state
+				if (!(keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT))) {
+					if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) || keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
+						playerState = PlayerState.WALK;
+					}
 				}
-				else if (jumpTime > 0 && absolute - jumpTime < this.JUMP_TRESHOLD) {
-					speed.y = Math.max(-this.PLAYER_JUMP_SIZE * delta, -this.PLAYER_JUMP_SIZE);
+
+				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_SPACE)) {
+					playerState = PlayerState.JUMP;
+				}
+				break;
+
+			case PlayerState.WALK:
+				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_SPACE)) {
+					playerState = PlayerState.JUMP;
+				}
+				//move left
+				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
+					speed.x = Math.max(-this.PLAYER_WALK_SPEED * delta, -this.PLAYER_WALK_SPEED);
+					console.log('GO LEFT', speed.x);
+					this.setonGround(false);
+				}
+				//move right
+				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT)) {
+					speed.x = Math.min(this.PLAYER_WALK_SPEED * delta, this.PLAYER_WALK_SPEED);
+					console.log('GO RIGHT', speed.x);
+					this.setonGround(false);
+				}
+				else {
+					playerState = PlayerState.STAND;
+				}
+				break;
+
+			case PlayerState.JUMP:
+				console.log('JUMP START, onGround: ', this.getonGround());
+				//move left
+				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
+					speed.x = Math.max(-this.PLAYER_WALK_SPEED * delta, -this.PLAYER_WALK_SPEED);
+					console.log('GO LEFT', speed.x);
+				}
+				//move right
+				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT)) {
+					speed.x = Math.min(this.PLAYER_WALK_SPEED * delta, this.PLAYER_WALK_SPEED);
+					console.log('GO RIGHT', speed.x);
+				}
+				//jump
+				let jumpTime = this.getJumpTime();
+				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_SPACE)) {
+					if (this.getonGround()) {
+						if (jumpTime == 0) {
+							console.log('start jump', absolute);
+							jumpTime = absolute;
+						}
+					}
+					if (jumpTime >= 0 && absolute - jumpTime < this.JUMP_TRESHOLD) {
+						this.setonGround(false);
+						console.log('doin jump');
+						speed.y += Math.max(-this.PLAYER_JUMP_SIZE * delta, -this.PLAYER_JUMP_SIZE);
+					}
+					else {
+						this.setJumpTime(0);
+						console.log('jmp timeout');
+						keyInputCmp.handleKey(ECS.Keys.KEY_SPACE);
+					}
+					this.setJumpTime(jumpTime);
 				}
 				else {
 					this.setJumpTime(0);
-					this.setonGround(false);
-					keyInputCmp.handleKey(ECS.Keys.KEY_SPACE);
-				};
-			}
+				}
+				//no jump if on the ground
+				if (this.getonGround()) {
+					playerState = PlayerState.STAND;
+					console.log('jump end');
+				}
+				console.log('jmp, speed y: ', speed.y)
+				break;
 		}
-		else {
+
+		if (!this.getonGround()) {
 			//add gravity
-			if (jumpTime > 0) this.setJumpTime(0);
 			if (!this.getonGround()) {
-				speed.y += this.GRAVITY * delta;
-				speed.y = Math.max(speed.y, this.GRAVITY);
+				speed.y += Math.max(this.GRAVITY * delta, this.GRAVITY;
 			}
 		}
 
+		console.log('speed after gravity, speed y: ', speed.y)
+
+
 		//save changes
+		this.setplayerState(playerState);
 		this.setspeed(speed);
 
 		//apply physics on player
@@ -320,6 +380,7 @@ class MyGame {
 			.withAttribute('speed', Vector2)
 			.withAttribute('onGround', true)
 			.withAttribute('jumpTime', 0)
+			.withAttribute('playerState', PlayerState.STAND)
 			.scale(TEXTURE_SCALE)
 			.build();
 
