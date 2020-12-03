@@ -10,6 +10,7 @@
     "typescript": "^4.1.2"
   },
   "scripts": {
-    "dev": "node scripts/prebuild.js && parcel index.html --out-dir build"
+    "dev": "node scripts/prebuild.js && parcel index.html --out-dir build",
+    "clean": "rm -rf node_modules && rm -rf build && rm -rf .cache"
   }
 }
