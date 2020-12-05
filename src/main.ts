@@ -66,13 +66,13 @@ class CollisionSide {
 
 class PlayerController extends ECS.Component {
 
-	readonly GRAVITY = 0.001;
+	readonly GRAVITY = 0.05;
 
 	readonly EPSILON = 1e-2;
 
-	readonly PLAYER_WALK_SPEED = 0.15;
-	readonly PLAYER_JUMP_SIZE = 0.25;
-	readonly JUMP_TRESHOLD = 150;
+	readonly PLAYER_WALK_SPEED = 0.10;
+	readonly PLAYER_JUMP_SIZE = 0.20;
+	readonly JUMP_TRESHOLD = 200;
 
 	onInit() {
 		this.setspeed(new Vector2(0, 0));
@@ -130,6 +130,69 @@ class PlayerController extends ECS.Component {
 		return Math.min(boundsA.bottom, boundsB.bottom) - Math.max(boundsA.top, boundsB.top);
 	}
 
+	private solveCollision(speedX: number, speedY: number, cBox: PIXI.Rectangle) {
+		let collisionSolved: boolean;
+
+		// save previous coords
+		let oldX = this.owner.position.x;
+		let oldY = this.owner.position.y;
+
+		//apply speed to player coords
+		this.owner.position.x += speedX;
+		this.owner.position.y += speedY;
+
+		let playerBox = this.owner.getBounds();
+
+		let horizIntersection = this.horizIntersection(playerBox, cBox);
+		let verIntersection = this.verIntersection(playerBox, cBox);
+
+		let collides = horizIntersection > 0 && verIntersection > 0;
+
+		if (!collides) {
+			this.owner.position.x = oldX;
+			this.owner.position.y = oldY;
+			collisionSolved = false;
+			return collisionSolved;
+		}
+
+		if (collides) {
+			if (speedY > 0) {
+				this.owner.y = oldY + (speedY - verIntersection);
+				speedY = 0;
+				this.setonGround(true);
+				console.log('Collision down, verInt: ', verIntersection);
+			}
+
+			//collision below player
+			if (speedY < 0) {
+				this.owner.y = oldY + (speedY + verIntersection);
+				speedY = 0;
+				this.setJumpTime(0);
+				console.log('Collision up, verInt: ', verIntersection);
+			}
+
+			//collision right to the player
+			if (speedX > 0) {
+				this.owner.x = oldX + (speedX - horizIntersection);
+				speedX = 0;
+				console.log('Collision right, horizInt: ', horizIntersection);
+			}
+
+			//collision left to the player
+			if (speedX < 0) {
+				this.owner.x = oldX + (speedX + horizIntersection);
+				speedX = 0;
+				console.log('Collision left, horizInt: ', horizIntersection);
+			}
+		}
+
+		this.owner.x = Math.round(this.owner.x * 100) / 100; //avoid float math error
+		this.owner.y = Math.round(this.owner.y * 100) / 100; //avoid float math error
+		collisionSolved = true;
+
+		return collisionSolved;
+	}
+
 	applyMovement() {
 		//horizontal movement
 		let speed = this.getspeed();
@@ -142,113 +205,68 @@ class PlayerController extends ECS.Component {
 		let oldX = this.owner.position.x;
 		let oldY = this.owner.position.y;
 
-
+		//apply speed to player coords
 		this.owner.position.x += speed.x;
 		this.owner.position.y += speed.y;
-
 
 		//check for collision with grounds
 		const grounds = this.scene.findObjectsByTag(Tags.GROUND);
 
-		// console.log('Col func start, on ground:', this.getonGround(), ', speed: ', speed);
+		console.log('Collision func start, on ground:', this.getonGround(), ', speed: ', speed);
+
+		let collisionOnX = false;
+		let collisionOnY = false;
+
+		let i = 0;
+		// let playerBox = this.owner.getBounds(); //get player cbox
+
+		let playerBox = this.owner.getBounds().clone();
 
 		for (let colider of grounds) {
-			let playerBox = this.owner.getBounds();
-			const cBox = colider.getBounds();
+			const cBox = colider.getBounds(); //get ground cbox
 
-			//solve vertical collision
+			//is there a intersection?
 			let horizIntersection = this.horizIntersection(playerBox, cBox);
 			let verIntersection = this.verIntersection(playerBox, cBox);
-
 			let collides = (horizIntersection > 0 && verIntersection > 0);
 
-
-			let isHorizontalCol = verIntersection < horizIntersection;
-
-			// if (this.getsideCol() && horizIntersection == 0) {
-			// 	this.setsideCol(false);
-			// 	console.log("sideCol = false");
-			// }
-
 			if (collides) {
+				console.log('collision #', i++);
 
-				// if (!isHorizontalCol == !this.getsideCol()) {
-				// 	this.setsideCol(true);
-				// 	console.log("sideCol = true");
+				//return position before movement to solve collision correctly
+				this.owner.position.x = oldX;
+				this.owner.position.y = oldY;
+
+				let colYres = this.solveCollision(0, speed.y, cBox);
+				let colXres = this.solveCollision(speed.x, 0, cBox);
+
+
+
+				if (!collisionOnX && colXres) collisionOnX = true;
+				if (!collisionOnY && colYres) collisionOnY = true;
+
+				oldX = this.owner.position.x;
+				oldY = this.owner.position.y;
+
+
+				// if (colXres && colYres) {
+				// 	break;
 				// }
-
-				// if (this.getsideCol()) {
-				// 	isHorizontalCol = false;
-				// }
-
-				console.log('col podlaha/strop? ', isHorizontalCol, ', hxv: ', verIntersection, ' < ', horizIntersection);
-				
-				if (isHorizontalCol) {
-					// console.log('playerCbox: ', playerBox, ' cbox: ', cBox);
-					//collision under player
-					if (speed.y > 0 && !this.getonGround()) {
-						this.owner.y = oldY + (speed.y - verIntersection);
-						speed.y = 0;
-						this.setonGround(true);
-						console.log('Collision down, verInt: ', verIntersection);
-					}
-
-					//collision below player
-					if (speed.y < 0) {
-						this.owner.y = oldY + (speed.y + verIntersection);
-						speed.y = 0;
-						this.setJumpTime(0);
-						console.log('Collision up, verInt: ', verIntersection);
-					}
-				}
-				else {
-					collides = (horizIntersection > 0 && verIntersection > 0.8);
-					if (collides) {
-						//collision right to the player
-						if (speed.x > 0) {
-							this.owner.x = oldX + (speed.x - horizIntersection);
-							speed.x = 0;
-							console.log('Collision right, horizInt: ', horizIntersection);
-						}
-
-						//collision left to the player
-						if (speed.x < 0) {
-							this.owner.x = oldX + (speed.x + horizIntersection);
-							speed.x = 0;
-							console.log('Collision left, horizInt: ', horizIntersection);
-						}
-					}
-				}
 			}
-			// speed.y *= 0.8;
-			// if (Math.abs(speed.y) < this.EPSILON) speed.y = 0;
-
-			// horizIntersection = this.horizIntersection(playerBox, cBox);
-			// verIntersection = this.verIntersection(playerBox, cBox);
-
-			// //solve horizontal collision
-			// collides = (horizIntersection > 0 && verIntersection > 0.8);
-			// if (collides) {
-			// 	//collision right to the player
-			// 	if (speed.x > 0) {
-			// 		this.owner.x = oldX + (speed.x - horizIntersection);
-			// 		speed.x = 0;
-			// 		console.log('Collision right, horizInt: ', horizIntersection);
-			// 	}
-
-			// 	//collision left to the player
-			// 	if (speed.x < 0) {
-			// 		this.owner.x = oldX + (speed.x + horizIntersection);
-			// 		speed.x = 0;
-			// 		console.log('Collision left, horizInt: ', horizIntersection);
-			// 	}
-			// }
 		}
-		speed.x = 0;
+		console.log('Collision func end, on ground:', this.getonGround(), ', speed: ', speed);
 
+		if (!collisionOnX) this.owner.position.x += speed.x;
+		if (!collisionOnY) this.owner.position.y += speed.y;
 
-		// speed.x *= 0.8;
-		// if (Math.abs(speed.x) < this.EPSILON) speed.x = 0;
+		// speed.x = 0;
+		// speed.y = 0;
+
+		speed.x *= 0.8;
+		speed.y *= 0.8;
+
+		if (Math.abs(speed.x) < this.EPSILON) speed.x = 0;
+		if (Math.abs(speed.y) < this.EPSILON) speed.y = 0;
 
 		//save changes
 		this.setspeed(speed);
@@ -351,7 +369,7 @@ class PlayerController extends ECS.Component {
 		if (!this.getonGround()) {
 			//add gravity
 			if (!this.getonGround()) {
-				speed.y += Math.max(this.GRAVITY * delta, this.GRAVITY);
+				speed.y += Math.min(this.GRAVITY * delta, this.GRAVITY);
 			}
 		}
 
