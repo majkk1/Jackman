@@ -10,15 +10,13 @@ export enum BlockType {
     EMPTY, WALL
 }
 
+export enum GlobalAttribute{
+    PLATFORM_MAP= 'platformMap'
+}
+
 export enum Tags {
     PLAYER = 'player',
     GROUND = 'ground'
-}
-
-export enum PlayerState {
-    STAND = 'STAND',
-    WALK = 'WALK',
-    JUMP = 'JUMP',
 }
 
 export class Vector2 {

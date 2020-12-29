@@ -1,7 +1,6 @@
 import * as ECS from '../libs/pixi-ecs';
-
 import { SCENE_WIDTH, Assets } from './constants'
-import { Factory } from './factory'
+import { MapLoader } from './map-loader'
 import { LevelParser } from './level-parser'
 
 
@@ -35,8 +34,8 @@ class MyGame {
 		const parser = new LevelParser();
 		const levels = parser.parse(levelData);
 
-		const factory = new Factory();
-		factory.loadLevel(levels[0], this.engine.scene);
+		const mapLoader = new MapLoader();
+		mapLoader.loadLevel(levels[0], this.engine.scene);
 	}
 
 }

@@ -10,10 +10,9 @@ export class LevelParser {
     parse(data: string) {
 
         let levels: Level[] = [];
+        let levelBuilder: LevelBuilder = null;
 
         const lines = data.split('\n').filter(line => line !== '');
-
-        let levelBuilder: LevelBuilder = null;
 
         lines.forEach(line => {
             if (line.startsWith(':')) {

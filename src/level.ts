@@ -1,4 +1,3 @@
-
 export class LevelBuilder {
 	name: string;
 	sizeX: number = 0;
