@@ -1,7 +1,8 @@
 import * as ECS from '../libs/pixi-ecs';
 import { Level } from './level'
-import { TEXTURE_SCALE, Tags, BlockType, GlobalAttribute } from './constants'
+import { TEXTURE_SCALE, Tags, BlockType, GlobalAttribute, ASSET_RES } from './constants'
 import { PlayerController } from './player-controller'
+import { Camera } from './camera'
 
 export class MapLoader {
 
@@ -17,7 +18,7 @@ export class MapLoader {
             platformMap.push([]);
             for (let x = 0; x < level.xSize; x++) {
                 if (level.tileTypesArr[y][x] === BlockType.WALL) {
-                    let sprite = new ECS.Sprite('', this.createTexture(0, 0, 32, 32));
+                    let sprite = new ECS.Sprite('', this.createTexture(0, 0, ASSET_RES, ASSET_RES));
                     sprite.scale.set(TEXTURE_SCALE);
                     sprite.position.x = x;
                     sprite.position.y = y;
@@ -38,12 +39,13 @@ export class MapLoader {
             .anchor(0, 0)
             .localPos(6, 4)
             .withTag(Tags.PLAYER)
-            .asSprite(this.createTexture(32, 0, 32, 32))
+            .asSprite(this.createTexture(32, 0, ASSET_RES, ASSET_RES))
             .withParent(scene.stage)
             .withComponent(new PlayerController())
+            .withComponent(new Camera())
             .scale(TEXTURE_SCALE)
             .build();
-
+        
         // add global components
         scene.addGlobalComponent(new ECS.KeyInputComponent());
     }
