@@ -39,8 +39,6 @@ export class PlayerController extends ECS.Component {
 	updatePlayerState(delta: number, absolute: number) {
 		const keyInputCmp = this.scene.findGlobalComponentByName<ECS.KeyInputComponent>(ECS.KeyInputComponent.name);
 
-		console.log(this.playerState);
-
 		switch (this.playerState) {
 			case PlayerState.STAND:
 				//if left or right arrow but not both -> goto WALK state

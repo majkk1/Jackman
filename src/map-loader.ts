@@ -26,6 +26,21 @@ export class MapLoader {
                     map.addChild(sprite);
                     platformMap[y].push(sprite);
                 }
+                else if (level.tileTypesArr[y][x] === BlockType.PLAYER) {
+                    //add player
+                    new ECS.Builder(scene)
+                        .anchor(0, 0)
+                        .localPos(x, y)
+                        .withTag(Tags.PLAYER)
+                        .asSprite(this.createTexture(32, 0, ASSET_RES, ASSET_RES))
+                        .withParent(scene.stage)
+                        .withComponent(new PlayerController())
+                        .withComponent(new Camera())
+                        .scale(TEXTURE_SCALE)
+                        .build();
+                    platformMap[y].push(null);
+
+                }
                 else {
                     platformMap[y].push(null);
                 }
@@ -34,18 +49,8 @@ export class MapLoader {
 
         scene.assignGlobalAttribute(GlobalAttribute.PLATFORM_MAP, platformMap);
 
-        //add player
-        new ECS.Builder(scene)
-            .anchor(0, 0)
-            .localPos(6, 4)
-            .withTag(Tags.PLAYER)
-            .asSprite(this.createTexture(32, 0, ASSET_RES, ASSET_RES))
-            .withParent(scene.stage)
-            .withComponent(new PlayerController())
-            .withComponent(new Camera())
-            .scale(TEXTURE_SCALE)
-            .build();
-        
+
+
         // add global components
         scene.addGlobalComponent(new ECS.KeyInputComponent());
     }

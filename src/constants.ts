@@ -13,7 +13,7 @@ export enum Assets {
 }
 
 export enum BlockType {
-    EMPTY, WALL
+    PLAYER, EMPTY, WALL
 }
 
 export enum GlobalAttribute {

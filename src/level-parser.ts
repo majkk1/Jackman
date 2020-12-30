@@ -2,6 +2,7 @@ import { BlockType } from './constants'
 import { Level, LevelBuilder } from './level'
 
 const decodeLvlChar = {
+    'P': BlockType.PLAYER,
     '.': BlockType.EMPTY,
     '#': BlockType.WALL
 }
