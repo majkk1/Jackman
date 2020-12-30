@@ -1,6 +1,7 @@
 import * as ECS from '../libs/pixi-ecs';
-import { DELTA_MUL, GRAVITY, JUMP_TRESHOLD, PLAYER_JUMP_SIZE, PLAYER_WALK_SPEED, Vector2 } from './constants/constants'
+import { DELTA_MUL, GRAVITY, JUMP_TRESHOLD, PLAYER_JUMP_SIZE, PLAYER_WALK_SPEED } from './constants/constants'
 import { Attribute, Direction, GlobalAttribute, PlayerState } from './constants/enums'
+import { Vector2 } from './utils/vector2';
 import { Level } from './level';
 import { BulletBuilder } from './bullet-builder';
 
@@ -8,7 +9,9 @@ export class PlayerController extends ECS.Component {
 
 	playerState: PlayerState = PlayerState.STAND;
 	isOnGround: boolean = false;
-	jumpTime: number = 0;
+	oldY: number;
+	jumpLen: number = 0;
+	inJump: boolean = false;
 	speed: Vector2 = new Vector2(0, 0);
 	direction: Direction;
 
@@ -22,7 +25,7 @@ export class PlayerController extends ECS.Component {
 		this.updatePlayerState(deltaMul, absolute);
 
 		//add gravity (if not on ground or not going up)
-		if ((!this.isOnGround || this.speed.x != 0) && this.jumpTime == 0) {
+		if ((!this.isOnGround || this.speed.x != 0) && !this.inJump) {
 			this.speed.y += GRAVITY * deltaMul;
 			this.speed.y = Math.min(this.speed.y, GRAVITY);
 		}
@@ -85,26 +88,39 @@ export class PlayerController extends ECS.Component {
 				}
 				//space -> jump
 				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_SPACE)) {
+					if (this.inJump) {
+						//measure len of the jump
+						console.log('jumplen: ', this.jumpLen)
+						this.jumpLen += this.oldY - this.owner.y;
+						this.oldY = this.owner.y;
+					}
+
 					// first stage of jump - add speed, remove gravity
-					if (this.isOnGround && this.jumpTime == 0) {
-						this.jumpTime = absolute;
+					if (this.isOnGround && !this.inJump) {
+						this.inJump = true;
+						this.oldY = this.owner.y;
 						this.speed.y = -PLAYER_JUMP_SIZE;
 						this.isOnGround = false;
-
+						console.log('jump start');
 					}
 					// end of jump (timeout)
-					else if (this.jumpTime >= 0 && absolute - this.jumpTime > JUMP_TRESHOLD) {
+					else if (!this.inJump || this.jumpLen > JUMP_TRESHOLD) {
+						this.inJump = false; // gravity is back
 						keyInputCmp.handleKey(ECS.Keys.KEY_SPACE);
-						this.jumpTime = 0; // gravity is back
+						this.jumpLen = 0; 
+						console.log('jump timeouted');
 					}
 				}
 				// end of jump
 				else {
-					this.jumpTime = 0;
+					this.jumpLen = 0;
+					this.inJump = false;
+					console.log('jump end');
+
 				}
 
 				//no jump && on the ground 
-				if (this.isOnGround && this.jumpTime == 0) {
+				if (this.isOnGround && this.inJump == false) {
 					this.playerState = PlayerState.STAND;
 				}
 				break;
@@ -164,7 +180,7 @@ export class PlayerController extends ECS.Component {
 			if (platformMap[Math.floor(pY)][Math.floor(pX)] !== null || platformMap[Math.floor(pY)][Math.ceil(pX)] !== null) {
 				//collision up
 				this.owner.position.y = Math.floor(pY) + 1;
-				this.jumpTime = 0
+				this.inJump = false;
 			}
 		}
 

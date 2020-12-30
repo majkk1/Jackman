@@ -16,8 +16,8 @@ export const decodeLevelChar = {
 //player-controller.ts
 export const GRAVITY = 0.5;
 export const PLAYER_WALK_SPEED = 0.8;
-export const PLAYER_JUMP_SIZE = 0.4;
-export const JUMP_TRESHOLD = 350;
+export const PLAYER_JUMP_SIZE = 0.5;
+export const JUMP_TRESHOLD = 3.5;
 
 //monster-controller.ts
 export const MONSTER_WALK_SPEED = 0.2;
@@ -25,14 +25,3 @@ export const MONSTER_WALK_SPEED = 0.2;
 //camera.ts
 export const CAMERA_X_BORDER = 9;
 export const CAMERA_Y_BORDER = 8;
-
-
-export class Vector2 {
-    x: number;
-    y: number;
-
-    constructor(x: number, y: number) {
-        this.x = x;
-        this.y = y;
-    }
-}
