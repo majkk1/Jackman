@@ -34,29 +34,8 @@ export class PlayerController extends ECS.Component {
 			this.speed.y = Math.min(this.speed.y, this.GRAVITY);
 		}
 
-		// console.log('speed after gravity, speed y: ', this.speed.y)
-
-		// let oldX = this.owner.x;
-		// let oldY = this.owner.y;
-
 		//apply physics on player
 		this.applyMovement(); //apply physics
-
-		// let changeX = oldX - this.owner.x;
-		// let changeY = oldY - this.owner.y;
-
-		// let mapLayer = this.scene.stage.getChildByName('mapLayer');
-		// console.log('change: ', changeX, changeY);
-
-		// if (this.owner.x < 3 || this.owner.x > 15) {
-		// 	this.scene.stage.x += changeX;
-		// }
-
-		// if (this.owner.y < 3 || this.owner.y > 11) {
-		// 	this.scene.stage.y += changeY;
-		// }
-
-
 	}
 
 	updatePlayerState(delta: number, absolute: number) {

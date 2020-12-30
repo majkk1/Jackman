@@ -3,8 +3,8 @@ export const ASSET_RES = 32; // 32x32 px
 export const TEXTURE_SCALE = 1 / ASSET_RES;
 
 //camera.ts
-export const CAMERA_X_BORDER = 8;
-export const CAMERA_Y_BORDER = 5;
+export const CAMERA_X_BORDER = 9;
+export const CAMERA_Y_BORDER = 8;
 
 
 export enum Assets {
