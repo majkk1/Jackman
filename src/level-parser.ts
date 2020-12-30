@@ -8,7 +8,7 @@ const decodeLvlChar = {
 }
 
 export class LevelParser {
-    parse(data: string) {
+    parse(data: string): Level[] {
 
         let levels: Level[] = [];
         let levelBuilder: LevelBuilder = null;

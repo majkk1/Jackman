@@ -1,6 +1,7 @@
 export const SCENE_WIDTH = 25;
 export const ASSET_RES = 32; // 32x32 px
 export const TEXTURE_SCALE = 1 / ASSET_RES;
+export const DELTA_MUL = 0.01;
 
 //camera.ts
 export const CAMERA_X_BORDER = 9;
@@ -17,12 +18,14 @@ export enum BlockType {
 }
 
 export enum GlobalAttribute {
-    PLATFORM_MAP = 'platformMap'
+    LEVEL = 'level'
 }
 
 export enum Tags {
     PLAYER = 'player',
-    GROUND = 'ground'
+    MONSTER = 'monster',
+    GROUND = 'ground',
+    BULLET = 'bullet'
 }
 
 export class Vector2 {

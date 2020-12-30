@@ -1,5 +1,8 @@
 import * as ECS from '../libs/pixi-ecs';
-import { Vector2, Tags, GlobalAttribute } from './constants'
+import { Vector2, Tags, GlobalAttribute, TEXTURE_SCALE, Assets, DELTA_MUL } from './constants'
+import { Direction, BulletController } from './bullet-controller';
+import { Level } from './level';
+import { BulletBuilder } from './bullet-builder';
 
 enum PlayerState {
 	STAND = 'STAND',
@@ -13,15 +16,17 @@ export class PlayerController extends ECS.Component {
 	isOnGround: boolean = false;
 	jumpTime: number = 0;
 	speed: Vector2 = new Vector2(0, 0);
+	direction: Direction = Direction.RIGHT;
 
-	readonly DELTA_MUL = 0.01;
+	hasGun: boolean = true;
+
 	readonly GRAVITY = 0.5;
 	readonly PLAYER_WALK_SPEED = 0.8;
 	readonly PLAYER_JUMP_SIZE = 0.4;
 	readonly JUMP_TRESHOLD = 350;
 
 	onUpdate(delta: number, absolute: number) {
-		let deltaMul = delta * this.DELTA_MUL;
+		let deltaMul = delta * DELTA_MUL;
 
 		//update player state, add movement 
 		this.updatePlayerState(deltaMul, absolute);
@@ -60,11 +65,13 @@ export class PlayerController extends ECS.Component {
 				}
 				//only left key pushed -> move left
 				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
+					this.direction = Direction.LEFT;
 					this.speed.x = Math.max(-this.PLAYER_WALK_SPEED * delta, -this.PLAYER_WALK_SPEED);
 					this.isOnGround = false;
 				}
 				//only right key pushed -> move right
 				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT)) {
+					this.direction = Direction.RIGHT;
 					this.speed.x = Math.min(this.PLAYER_WALK_SPEED * delta, this.PLAYER_WALK_SPEED);
 					this.isOnGround = false;
 				}
@@ -77,10 +84,12 @@ export class PlayerController extends ECS.Component {
 			case PlayerState.JUMP:
 				//move left
 				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
+					this.direction = Direction.LEFT;
 					this.speed.x = Math.max(-this.PLAYER_WALK_SPEED * delta, -this.PLAYER_WALK_SPEED);
 				}
 				//move right
 				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT)) {
+					this.direction = Direction.RIGHT;
 					this.speed.x = Math.min(this.PLAYER_WALK_SPEED * delta, this.PLAYER_WALK_SPEED);
 				}
 				//space -> jump
@@ -109,10 +118,18 @@ export class PlayerController extends ECS.Component {
 				}
 				break;
 		}
+
+		//fire
+		if (this.hasGun && keyInputCmp.isKeyPressed(ECS.Keys.KEY_CTRL)) {
+			let bullet = new BulletBuilder(this.direction, this.owner, this.scene);
+			bullet.build();
+
+			keyInputCmp.handleKey(ECS.Keys.KEY_CTRL);
+		}
 	}
 
 	applyMovement() {
-		let platformMap = this.scene.getGlobalAttribute(GlobalAttribute.PLATFORM_MAP);
+		let platformMap = this.scene.getGlobalAttribute<Level>(GlobalAttribute.LEVEL).map;
 
 		//if no movement, return
 		if (this.speed.x == 0 && this.speed.y == 0) return;
