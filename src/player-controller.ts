@@ -21,25 +21,25 @@ export class PlayerController extends ECS.Component {
 	readonly JUMP_TRESHOLD = 350;
 
 	onUpdate(delta: number, absolute: number) {
-
 		let deltaMul = delta * this.DELTA_MUL;
 
-		// console.log('state: ', this.playerState);
-
-		this.updatePlayerState(deltaMul, absolute); //update player state, add movement 
+		//update player state, add movement 
+		this.updatePlayerState(deltaMul, absolute);
 
 		//add gravity (if not on ground or not going up)
-		if (!this.isOnGround && this.jumpTime == 0) {
+		if ((!this.isOnGround || this.speed.x != 0) && this.jumpTime == 0) {
 			this.speed.y += this.GRAVITY * deltaMul;
 			this.speed.y = Math.min(this.speed.y, this.GRAVITY);
 		}
 
 		//apply physics on player
-		this.applyMovement(); //apply physics
+		this.applyMovement();
 	}
 
 	updatePlayerState(delta: number, absolute: number) {
 		const keyInputCmp = this.scene.findGlobalComponentByName<ECS.KeyInputComponent>(ECS.KeyInputComponent.name);
+
+		console.log(this.playerState);
 
 		switch (this.playerState) {
 			case PlayerState.STAND:
@@ -59,14 +59,13 @@ export class PlayerController extends ECS.Component {
 				//space pushed -> goto JUMP
 				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_SPACE)) {
 					this.playerState = PlayerState.JUMP;
-					// console.log('state: WALK->JUMP');
 				}
-				//move left
+				//only left key pushed -> move left
 				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
 					this.speed.x = Math.max(-this.PLAYER_WALK_SPEED * delta, -this.PLAYER_WALK_SPEED);
 					this.isOnGround = false;
 				}
-				//move right
+				//only right key pushed -> move right
 				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT)) {
 					this.speed.x = Math.min(this.PLAYER_WALK_SPEED * delta, this.PLAYER_WALK_SPEED);
 					this.isOnGround = false;
@@ -78,46 +77,38 @@ export class PlayerController extends ECS.Component {
 				break;
 
 			case PlayerState.JUMP:
-				// console.log('state: JUMP START, onGround: ', this.isOnGround);
 				//move left
 				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
-					// console.log('state: JUMP, key left');
 					this.speed.x = Math.max(-this.PLAYER_WALK_SPEED * delta, -this.PLAYER_WALK_SPEED);
 				}
 				//move right
 				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT)) {
-					// console.log('state: JUMP, key right');
 					this.speed.x = Math.min(this.PLAYER_WALK_SPEED * delta, this.PLAYER_WALK_SPEED);
 				}
-				//jump
+				//space -> jump
 				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_SPACE)) {
-					// console.log('state: JUMP, key space');
-					if (this.isOnGround) {
-						if (this.jumpTime == 0) {
-							// console.log('start jump', absolute);
-							this.jumpTime = absolute;
-							this.speed.y = -this.PLAYER_JUMP_SIZE;
-						}
-					}
-					if (this.jumpTime >= 0 && absolute - this.jumpTime < this.JUMP_TRESHOLD) {
+					// first stage of jump - add speed, remove gravity
+					if (this.isOnGround && this.jumpTime == 0) {
+						this.jumpTime = absolute;
+						this.speed.y = -this.PLAYER_JUMP_SIZE;
 						this.isOnGround = false;
-						// console.log('doin jump');
+
 					}
-					else {
-						this.jumpTime = 0;
-						// console.log('jmp timeout');
+					// end of jump (timeout)
+					else if (this.jumpTime >= 0 && absolute - this.jumpTime > this.JUMP_TRESHOLD) {
 						keyInputCmp.handleKey(ECS.Keys.KEY_SPACE);
+						this.jumpTime = 0; // gravity is back
 					}
 				}
+				// end of jump
 				else {
 					this.jumpTime = 0;
 				}
-				//no jump && on the ground
+
+				//no jump && on the ground 
 				if (this.isOnGround && this.jumpTime == 0) {
 					this.playerState = PlayerState.STAND;
-					// console.log('jump end');
 				}
-				// console.log('jmp, speed y: ', this.speed.y)
 				break;
 		}
 	}
@@ -125,14 +116,8 @@ export class PlayerController extends ECS.Component {
 	applyMovement() {
 		let platformMap = this.scene.getGlobalAttribute(GlobalAttribute.PLATFORM_MAP);
 
-		//if no movement
+		//if no movement, return
 		if (this.speed.x == 0 && this.speed.y == 0) return;
-
-		// save previous coords
-		let oldX = this.owner.position.x;
-		let oldY = this.owner.position.y;
-
-
 
 		//solve horizontal collision (x-axis)
 		this.owner.position.x += this.speed.x;
@@ -141,17 +126,17 @@ export class PlayerController extends ECS.Component {
 		if (this.speed.x > 0) {
 			//player moving right
 			if (platformMap[Math.floor(pY)][Math.floor(pX + 1)] !== null || platformMap[Math.ceil(pY)][Math.floor(pX + 1)] !== null) {
-				//collision detected
-				// console.log('collision right')
+				//collision right
 				this.owner.position.x = Math.floor(pX);
+				this.speed.x = 0;
 			}
 		}
 		else if (this.speed.x < 0) {
 			//player moving left
 			if (platformMap[Math.floor(pY)][Math.floor(pX)] !== null || platformMap[Math.ceil(pY)][Math.floor(pX)] !== null) {
-				//collision detected
-				// console.log('collision left')
+				//collision left
 				this.owner.position.x = Math.floor(pX) + 1;
+				this.speed.x = 0;
 			}
 		}
 
@@ -162,8 +147,7 @@ export class PlayerController extends ECS.Component {
 		if (this.speed.y > 0) {
 			//player moving down
 			if (platformMap[Math.floor(pY + 1)][Math.floor(pX)] !== null || platformMap[Math.floor(pY + 1)][Math.ceil(pX)] !== null) {
-				//collision detected
-				// console.log('collision down')
+				//collision down
 				this.owner.position.y = Math.floor(pY);
 				this.isOnGround = true;
 				this.speed.y = 0;
@@ -172,18 +156,17 @@ export class PlayerController extends ECS.Component {
 		else if (this.speed.y < 0) {
 			//player moving up
 			if (platformMap[Math.floor(pY)][Math.floor(pX)] !== null || platformMap[Math.floor(pY)][Math.ceil(pX)] !== null) {
-				//collision detected
-				// console.log('collision up')
+				//collision up
 				this.owner.position.y = Math.floor(pY) + 1;
 				this.jumpTime = 0
 			}
 		}
 
+		//reduce speed
 		this.speed.x *= 0.7;
 		this.speed.y *= 0.9;
 
 		if (Math.abs(this.speed.x) < 0.01) this.speed.x = 0;
 		if (Math.abs(this.speed.y) < 0.01) this.speed.y = 0;
-
 	}
 }
