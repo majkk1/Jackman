@@ -1,5 +1,6 @@
 import * as ECS from '../libs/pixi-ecs';
-import { SCENE_WIDTH, Assets } from './constants'
+import { SCENE_WIDTH } from './constants/constants'
+import { Assets } from './constants/enums'
 import { MapLoader } from './map-loader'
 import { LevelParser } from './level-parser'
 
@@ -40,6 +41,5 @@ class MyGame {
 
 }
 
-
-// this will create a new instance as soon as this file is loaded
+// start game
 export default new MyGame();

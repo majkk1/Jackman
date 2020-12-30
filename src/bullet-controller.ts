@@ -1,11 +1,8 @@
 import * as ECS from '../libs/pixi-ecs';
-import { DELTA_MUL, Tags, GlobalAttribute } from './constants';
+import { DELTA_MUL } from './constants/constants';
+import { Tags, GlobalAttribute, Direction } from './constants/enums';
 import { Level } from './level';
 
-export enum Direction {
-    LEFT = 'left',
-    RIGHT = 'right'
-}
 
 export class BulletController extends ECS.Component {
 
@@ -16,12 +13,10 @@ export class BulletController extends ECS.Component {
 
     constructor(direction: Direction) {
         super();
-
         this.direction = direction;
     }
 
     onInit() {
-        console.log('projectile fired!', this.direction);
         this.level = this.scene.getGlobalAttribute<Level>(GlobalAttribute.LEVEL);
     }
 
@@ -62,8 +57,6 @@ export class BulletController extends ECS.Component {
 
         let objects = [...ground, ...monsters];
 
-        console.log(this.scene.stage.width);
-
         for (let colider of objects) {
             const cBox = colider.getBounds(); //get ground cbox
 
@@ -74,9 +67,13 @@ export class BulletController extends ECS.Component {
 
             if (collides) {
                 this.owner.destroy();
+
+                if (colider.hasTag(Tags.MONSTER)) {
+                    colider.destroy();
+                }
+
                 return;
             }
         }
-
     }
 }

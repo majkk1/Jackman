@@ -1,7 +1,7 @@
 import * as ECS from '../libs/pixi-ecs';
-import { BulletController, Direction } from './bullet-controller';
-import { Assets, Tags, TEXTURE_SCALE } from './constants'
-
+import { TEXTURE_SCALE } from './constants/constants'
+import { Assets, Direction, Tags } from './constants/enums'
+import { BulletController } from './bullet-controller';
 
 export class BulletBuilder {
     direction: Direction;

@@ -1,5 +1,5 @@
 import * as ECS from '../libs/pixi-ecs';
-import {BlockType} from './constants'
+import { BlockType } from './constants/enums'
 
 export class LevelBuilder {
     name: string;
@@ -43,7 +43,7 @@ export class Level {
         return this._tileTypesArr;
     }
 
-    get map(){
+    get map() {
         return this._map;
     }
 }

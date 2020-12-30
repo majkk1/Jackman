@@ -1,14 +1,8 @@
 import * as ECS from '../libs/pixi-ecs';
-import { Vector2, Tags, GlobalAttribute, TEXTURE_SCALE, Assets, DELTA_MUL } from './constants'
-import { Direction, BulletController } from './bullet-controller';
+import { DELTA_MUL, GRAVITY, JUMP_TRESHOLD, PLAYER_JUMP_SIZE, PLAYER_WALK_SPEED, Vector2 } from './constants/constants'
+import { Attribute, Direction, GlobalAttribute, PlayerState } from './constants/enums'
 import { Level } from './level';
 import { BulletBuilder } from './bullet-builder';
-
-enum PlayerState {
-	STAND = 'STAND',
-	WALK = 'WALK',
-	JUMP = 'JUMP',
-}
 
 export class PlayerController extends ECS.Component {
 
@@ -16,16 +10,12 @@ export class PlayerController extends ECS.Component {
 	isOnGround: boolean = false;
 	jumpTime: number = 0;
 	speed: Vector2 = new Vector2(0, 0);
-	direction: Direction = Direction.RIGHT;
+	direction: Direction;
 
-	hasGun: boolean = true;
-
-	readonly GRAVITY = 0.5;
-	readonly PLAYER_WALK_SPEED = 0.8;
-	readonly PLAYER_JUMP_SIZE = 0.4;
-	readonly JUMP_TRESHOLD = 350;
+	hasGun: boolean = true; //TODO
 
 	onUpdate(delta: number, absolute: number) {
+		this.direction = this.owner.getAttribute(Attribute.DIRECTION)
 		let deltaMul = delta * DELTA_MUL;
 
 		//update player state, add movement 
@@ -33,12 +23,13 @@ export class PlayerController extends ECS.Component {
 
 		//add gravity (if not on ground or not going up)
 		if ((!this.isOnGround || this.speed.x != 0) && this.jumpTime == 0) {
-			this.speed.y += this.GRAVITY * deltaMul;
-			this.speed.y = Math.min(this.speed.y, this.GRAVITY);
+			this.speed.y += GRAVITY * deltaMul;
+			this.speed.y = Math.min(this.speed.y, GRAVITY);
 		}
 
 		//apply physics on player
 		this.applyMovement();
+		this.owner.assignAttribute(Attribute.DIRECTION, this.direction)
 	}
 
 	updatePlayerState(delta: number, absolute: number) {
@@ -66,13 +57,13 @@ export class PlayerController extends ECS.Component {
 				//only left key pushed -> move left
 				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
 					this.direction = Direction.LEFT;
-					this.speed.x = Math.max(-this.PLAYER_WALK_SPEED * delta, -this.PLAYER_WALK_SPEED);
+					this.speed.x = Math.max(-PLAYER_WALK_SPEED * delta, -PLAYER_WALK_SPEED);
 					this.isOnGround = false;
 				}
 				//only right key pushed -> move right
 				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT)) {
 					this.direction = Direction.RIGHT;
-					this.speed.x = Math.min(this.PLAYER_WALK_SPEED * delta, this.PLAYER_WALK_SPEED);
+					this.speed.x = Math.min(PLAYER_WALK_SPEED * delta, PLAYER_WALK_SPEED);
 					this.isOnGround = false;
 				}
 				//nothing happened
@@ -85,24 +76,24 @@ export class PlayerController extends ECS.Component {
 				//move left
 				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
 					this.direction = Direction.LEFT;
-					this.speed.x = Math.max(-this.PLAYER_WALK_SPEED * delta, -this.PLAYER_WALK_SPEED);
+					this.speed.x = Math.max(-PLAYER_WALK_SPEED * delta, -PLAYER_WALK_SPEED);
 				}
 				//move right
 				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT)) {
 					this.direction = Direction.RIGHT;
-					this.speed.x = Math.min(this.PLAYER_WALK_SPEED * delta, this.PLAYER_WALK_SPEED);
+					this.speed.x = Math.min(PLAYER_WALK_SPEED * delta, PLAYER_WALK_SPEED);
 				}
 				//space -> jump
 				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_SPACE)) {
 					// first stage of jump - add speed, remove gravity
 					if (this.isOnGround && this.jumpTime == 0) {
 						this.jumpTime = absolute;
-						this.speed.y = -this.PLAYER_JUMP_SIZE;
+						this.speed.y = -PLAYER_JUMP_SIZE;
 						this.isOnGround = false;
 
 					}
 					// end of jump (timeout)
-					else if (this.jumpTime >= 0 && absolute - this.jumpTime > this.JUMP_TRESHOLD) {
+					else if (this.jumpTime >= 0 && absolute - this.jumpTime > JUMP_TRESHOLD) {
 						keyInputCmp.handleKey(ECS.Keys.KEY_SPACE);
 						this.jumpTime = 0; // gravity is back
 					}

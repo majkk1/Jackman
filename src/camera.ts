@@ -1,5 +1,5 @@
 import * as ECS from '../libs/pixi-ecs';
-import { CAMERA_X_BORDER, CAMERA_Y_BORDER } from './constants';
+import { CAMERA_X_BORDER, CAMERA_Y_BORDER } from './constants/constants';
 
 export class Camera extends ECS.Component {
 

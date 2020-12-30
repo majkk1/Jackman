@@ -1,11 +1,5 @@
-import { BlockType } from './constants'
+import { decodeLevelChar } from './constants/constants'
 import { Level, LevelBuilder } from './level'
-
-const decodeLvlChar = {
-    'P': BlockType.PLAYER,
-    '.': BlockType.EMPTY,
-    '#': BlockType.WALL
-}
 
 export class LevelParser {
     parse(data: string): Level[] {
@@ -32,7 +26,7 @@ export class LevelParser {
                     continue;
                 }
 
-                let decodedCharacter = decodeLvlChar[character];
+                let decodedCharacter = decodeLevelChar[character];
                 if (decodedCharacter !== undefined) {
 
                     levelBuilder.tileTypesArr[levelBuilder.sizeY].push(decodedCharacter);
