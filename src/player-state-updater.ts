@@ -1,5 +1,6 @@
 import * as ECS from '../libs/pixi-ecs';
-import { GUN_AMMO_CAPACITY, INIT_HEALTH } from './constants/constants'
+import { BlinkingSprite } from './blinking-sprite';
+import { GUN_AMMO_CAPACITY, INIT_HEALTH, PLAYER_IMMORTALITY_TIME } from './constants/constants'
 import { Attribute, Messages } from './constants/enums'
 import { PlayerGun } from './player-gun';
 
@@ -46,6 +47,7 @@ export class PlayerStateUpdater extends ECS.Component {
 			case Messages.HEALTH_REMOVE:
 				this.health--;
 				this.owner.assignAttribute(Attribute.HEALTH, this.health);
+				this.owner.addComponent(new BlinkingSprite(PLAYER_IMMORTALITY_TIME)); //blinking animation
 				if (this.health == 0) {
 					this.sendMessage(Messages.PLAYER_DEAD);
 				}

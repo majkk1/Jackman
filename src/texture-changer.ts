@@ -12,6 +12,10 @@ export class TextureChanger extends ECS.Component {
 
         this.leftTexture = this.owner.asSprite().texture;
         this.rightTexture = new PIXI.Texture(this.leftTexture.baseTexture, this.leftTexture.frame, null, null, 12);
+
+        if (this.direction == Direction.RIGHT) {
+            this.owner.asSprite().texture = this.rightTexture;
+        }
     }
 
     onUpdate() {

@@ -19,6 +19,9 @@ export const decodeLevelChar = {
 //player-state-updater.ts
 export const GUN_AMMO_CAPACITY = 7;
 
+//player-collision.ts
+export const PLAYER_IMMORTALITY_TIME = 1000; //in ms
+
 //player-controller.ts
 export const GRAVITY = 0.5;
 export const PLAYER_WALK_SPEED = 0.8;

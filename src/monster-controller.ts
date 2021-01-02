@@ -17,9 +17,6 @@ export class MonsterController extends ECS.Component {
         }
         else {
             this.direction = Direction.RIGHT;
-            //rotate texture
-            this.owner.asSprite().anchor.x = 1;
-            this.owner.asSprite().scale.x *= -1;
         }
 
         this.owner.assignAttribute(Attribute.DIRECTION, this.direction);

@@ -17,11 +17,16 @@ export class PlayerGun extends ECS.Component {
 		let gunTexture = PIXI.Texture.from(Assets.SPRITESHEET).clone();
 		gunTexture.frame = new PIXI.Rectangle(224, 0, ASSET_RES, ASSET_RES);
 
+		//if player direction === right -> flip texture
+		const playerDirection = this.owner.getAttribute(Attribute.DIRECTION);
+		if (playerDirection == Direction.RIGHT){
+			gunTexture = new PIXI.Texture(gunTexture.baseTexture, gunTexture.frame, null, null, 12);
+		}
+
 		//create gun sprite
 		let gunSprite = new ECS.Sprite('gun sprite',gunTexture);
 		gunSprite.anchor.x = 0.5;
 		gunSprite.x += gunSprite.width/2;
-		gunSprite.addComponent(new TextureChanger());
 		this.owner.addChild(gunSprite);
 	}
 

@@ -1,5 +1,5 @@
 import * as ECS from '../libs/pixi-ecs';
-import { HEALTH_LIMIT } from './constants/constants';
+import { HEALTH_LIMIT, PLAYER_IMMORTALITY_TIME } from './constants/constants';
 import { Attribute, Messages, Tags } from './constants/enums'
 
 export class PlayerCollision extends ECS.Component {
@@ -40,7 +40,7 @@ export class PlayerCollision extends ECS.Component {
 
     private checkCollisionMonsters(absolute: number) {
         //don't detect collision for 1 sec after last detection
-        if (this.lastCollisionMonster !== 0 && absolute - this.lastCollisionMonster > 1000) {
+        if (this.lastCollisionMonster !== 0 && absolute - this.lastCollisionMonster > PLAYER_IMMORTALITY_TIME) {
             this.lastCollisionMonster = 0;
         }
 
