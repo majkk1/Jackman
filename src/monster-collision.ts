@@ -1,5 +1,5 @@
 import * as ECS from '../libs/pixi-ecs';
-import { Tags } from './constants/enums'
+import { Messages, Tags } from './constants/enums'
 
 export class MonsterCollision extends ECS.Component {
 
@@ -30,15 +30,11 @@ export class MonsterCollision extends ECS.Component {
         let collides = (horizIntersection > 0 && verIntersection > 0);
 
         if (collides) {
-            //
-            //TODO send message to health manager 
-            //
-            console.log('collision with player!')
+            this.sendMessage(Messages.HEALTH_REMOVE);
             return true;
         }
         return false;
     }
-
 
     private horizIntersection(boundsA: PIXI.Rectangle, boundsB: PIXI.Rectangle) {
         return Math.min(boundsA.right, boundsB.right) - Math.max(boundsA.left, boundsB.left);

@@ -1,6 +1,6 @@
 import * as ECS from '../libs/pixi-ecs';
 import { DELTA_MUL, GRAVITY, JUMP_TRESHOLD, PLAYER_JUMP_SIZE, PLAYER_WALK_SPEED } from './constants/constants'
-import { Attribute, Direction, GlobalAttribute, PlayerState } from './constants/enums'
+import { Attribute, Direction, Messages, GlobalAttribute, PlayerState } from './constants/enums'
 import { Vector2 } from './utils/vector2';
 import { Level } from './level';
 import { BulletBuilder } from './bullet-builder';
@@ -17,6 +17,10 @@ export class PlayerController extends ECS.Component {
 
 	hasGun: boolean = true; //TODO
 
+	onInit() {
+		this.sendMessage(Messages.HEALTH_INIT, 3);
+	}
+
 	onUpdate(delta: number, absolute: number) {
 		this.direction = this.owner.getAttribute(Attribute.DIRECTION)
 		let deltaMul = delta * DELTA_MUL;
@@ -26,6 +30,7 @@ export class PlayerController extends ECS.Component {
 
 		//add gravity (if not on ground or not going up)
 		if ((!this.isOnGround || this.speed.x != 0) && !this.inJump) {
+			this.isOnGround = false;
 			this.speed.y += GRAVITY * deltaMul;
 			this.speed.y = Math.min(this.speed.y, GRAVITY);
 		}
@@ -90,7 +95,6 @@ export class PlayerController extends ECS.Component {
 				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_SPACE)) {
 					if (this.inJump) {
 						//measure len of the jump
-						console.log('jumplen: ', this.jumpLen)
 						this.jumpLen += this.oldY - this.owner.y;
 						this.oldY = this.owner.y;
 					}
@@ -101,22 +105,18 @@ export class PlayerController extends ECS.Component {
 						this.oldY = this.owner.y;
 						this.speed.y = -PLAYER_JUMP_SIZE;
 						this.isOnGround = false;
-						console.log('jump start');
 					}
 					// end of jump (timeout)
 					else if (!this.inJump || this.jumpLen > JUMP_TRESHOLD) {
 						this.inJump = false; // gravity is back
 						keyInputCmp.handleKey(ECS.Keys.KEY_SPACE);
-						this.jumpLen = 0; 
-						console.log('jump timeouted');
+						this.jumpLen = 0;
 					}
 				}
 				// end of jump
 				else {
 					this.jumpLen = 0;
 					this.inJump = false;
-					console.log('jump end');
-
 				}
 
 				//no jump && on the ground 

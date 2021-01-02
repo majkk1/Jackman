@@ -5,12 +5,12 @@ import { BulletController } from './bullet-controller';
 
 export class BulletBuilder {
     direction: Direction;
-    owner: ECS.Container;
+    player: ECS.Container;
     scene: ECS.Scene;
 
-    constructor(direction: Direction, owner: ECS.Container, scene: ECS.Scene) {
+    constructor(direction: Direction, player: ECS.Container, scene: ECS.Scene) {
         this.direction = direction;
-        this.owner = owner;
+        this.player = player;
         this.scene = scene;
     }
 
@@ -23,10 +23,10 @@ export class BulletBuilder {
 
         new ECS.Builder(this.scene)
             .anchor(0.5)
-            .localPos(this.owner.x + this.owner.width / 2, this.owner.y + this.owner.height / 2)
+            .localPos(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2)
             .withTag(Tags.BULLET)
             .asSprite(texture)
-            .withParent(this.owner.scene.stage)
+            .withParent(<ECS.Container>this.player.parent)
             .withComponent(controller)
             .scale(TEXTURE_SCALE)
             .build();

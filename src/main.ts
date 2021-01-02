@@ -3,6 +3,7 @@ import { SCENE_WIDTH } from './constants/constants'
 import { Assets } from './constants/enums'
 import { MapLoader } from './map-loader'
 import { LevelParser } from './level-parser'
+import { StageManager } from './stage-manager'
 
 
 // TODO rename your game
@@ -29,14 +30,7 @@ class MyGame {
 	}
 
 	loadGame() {
-		const levelData = this.engine.app.loader.resources[Assets.LEVELS].data;
-
-		//parse level data
-		const parser = new LevelParser();
-		const levels = parser.parse(levelData);
-
-		const mapLoader = new MapLoader();
-		mapLoader.loadLevel(levels[0], this.engine.scene);
+		this.engine.scene.stage.addComponentAndRun(new StageManager());
 	}
 
 }

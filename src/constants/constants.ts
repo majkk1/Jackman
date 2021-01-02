@@ -1,4 +1,4 @@
-import {BlockType} from './enums'
+import { BlockType } from './enums'
 
 export const SCENE_WIDTH = 25;
 export const ASSET_RES = 32; // 32x32 px
@@ -25,3 +25,6 @@ export const MONSTER_WALK_SPEED = 0.2;
 //camera.ts
 export const CAMERA_X_BORDER = 9;
 export const CAMERA_Y_BORDER = 8;
+
+// statusbar/healthbar-controller.ts
+export const HEALTH_LIMIT = 10;
