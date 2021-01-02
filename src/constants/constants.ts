@@ -12,8 +12,12 @@ export const decodeLevelChar = {
     '#': BlockType.WALL,
     'M': BlockType.MONSTER,
     'h': BlockType.HEALTH_COIN,
-    'c': BlockType.COIN
+    'c': BlockType.COIN,
+    'g': BlockType.GUN
 }
+
+//player-state-updater.ts
+export const GUN_AMMO_CAPACITY = 7;
 
 //player-controller.ts
 export const GRAVITY = 0.5;

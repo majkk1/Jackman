@@ -53,6 +53,16 @@ export class MapLoader {
                     map.addChild(sprite);
                     level.map[y].push(null);
                 }
+                else if (level.tileTypesArr[y][x] === BlockType.GUN){
+                    let sprite = new ECS.Sprite(`gun [${x},${y}]`, this.createTexture(192, 0, ASSET_RES, ASSET_RES));
+                    sprite.scale.set(TEXTURE_SCALE);
+                    sprite.position.x = x;
+                    sprite.position.y = y;
+                    sprite.addTag(Tags.POWERUP);
+                    sprite.addTag(Tags.GUN);
+                    map.addChild(sprite);
+                    level.map[y].push(null);
+                }
                 else if (level.tileTypesArr[y][x] === BlockType.PLAYER) {
                     //add player
                     playerX = x;
@@ -84,9 +94,10 @@ export class MapLoader {
             .withComponent(new PlayerCollision())
             .withComponent(new PlayerStateUpdater())
             .withComponent(new Camera())
-            .withComponent(new TextureChanger(0, 32))
+            .withComponent(new TextureChanger())
             .withAttribute(Attribute.DIRECTION, Direction.LEFT)
             .withAttribute(Attribute.COINS, 0)
+            .withAttribute(Attribute.AMMO, 0)
             .scale(TEXTURE_SCALE)
             .build();
     }
@@ -97,11 +108,10 @@ export class MapLoader {
             .localPos(x, y)
             .withName('Monster')
             .withTag(Tags.MONSTER)
-            .asSprite(this.createTexture(0, 64, ASSET_RES, ASSET_RES))
+            .asSprite(this.createTexture(32, 32, ASSET_RES, ASSET_RES))
             .withParent(<ECS.Container>scene.stage.getChildByName(Layer.MAP_LAYER))
             .withComponent(new MonsterController())
-            .withComponent(new TextureChanger(0, 64))
-            .withAttribute(Attribute.DIRECTION, Direction.LEFT)
+            .withComponent(new TextureChanger())
             .scale(TEXTURE_SCALE)
             .build();
     }

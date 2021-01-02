@@ -27,8 +27,12 @@ export class PlayerCollision extends ECS.Component {
                     collider.destroy();
                 }
             }
-            if (collider.hasTag(Tags.COIN)) {
+            else if (collider.hasTag(Tags.COIN)) {
                 this.sendMessage(Messages.COIN_ADD);
+                collider.destroy();
+            }
+            else if (collider.hasTag(Tags.GUN)) {
+                this.sendMessage(Messages.GUN_TAKE);
                 collider.destroy();
             }
         }

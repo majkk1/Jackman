@@ -7,11 +7,12 @@ export enum Assets {
 export enum Attribute {
     DIRECTION = 'direction',
     HEALTH = 'health',
-    COINS = 'coins'
+    COINS = 'coins',
+    AMMO = 'ammo'
 }
 
 export enum BlockType {
-    PLAYER, EMPTY, WALL, MONSTER, HEALTH_COIN, COIN
+    PLAYER, EMPTY, WALL, MONSTER, HEALTH_COIN, COIN, GUN
 }
 
 export enum Direction {
@@ -28,6 +29,7 @@ export enum Layer {
     STATUSBAR = 'Statusbar',
     HEALTHBAR = 'Healthbar',
     COINBAR = 'Coinbar',
+    AMMOBAR = 'Ammobar'
 }
 
 export enum Messages {
@@ -38,6 +40,11 @@ export enum Messages {
     HEALTH_REMOVE = 'Health remove',
     COIN_ADD = 'coin add',
     COIN_SET = 'coin set',
+
+    GUN_TAKE = 'gun take',
+    AMMO_SET = 'ammo set',
+    GUN_FIRE = 'gun fire',
+    GUN_DROP = 'gun drop',
 
     PLAYER_DEAD = 'Player dead',
 }
@@ -56,4 +63,5 @@ export enum Tags {
     POWERUP = 'powerup',
     HEALTH_COIN = 'health coin',
     COIN = 'coin',
+    GUN = 'gun'
 }
