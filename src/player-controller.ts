@@ -1,6 +1,6 @@
 import * as ECS from '../libs/pixi-ecs';
 import { DELTA_MUL, GRAVITY, JUMP_TRESHOLD, PLAYER_JUMP_SIZE, PLAYER_WALK_SPEED } from './constants/constants'
-import { Attribute, Direction, Messages, GlobalAttribute, PlayerState } from './constants/enums'
+import { Attribute, Direction, GlobalAttribute, PlayerState } from './constants/enums'
 import { Vector2 } from './utils/vector2';
 import { Level } from './level';
 import { BulletBuilder } from './bullet-builder';
@@ -17,9 +17,6 @@ export class PlayerController extends ECS.Component {
 
 	hasGun: boolean = true; //TODO
 
-	onInit() {
-		this.sendMessage(Messages.HEALTH_INIT, 3);
-	}
 
 	onUpdate(delta: number, absolute: number) {
 		this.direction = this.owner.getAttribute(Attribute.DIRECTION)

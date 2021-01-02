@@ -11,6 +11,8 @@ export const decodeLevelChar = {
     '.': BlockType.EMPTY,
     '#': BlockType.WALL,
     'M': BlockType.MONSTER,
+    'h': BlockType.HEALTH_COIN,
+    'c': BlockType.COIN
 }
 
 //player-controller.ts
@@ -18,6 +20,7 @@ export const GRAVITY = 0.5;
 export const PLAYER_WALK_SPEED = 0.8;
 export const PLAYER_JUMP_SIZE = 0.5;
 export const JUMP_TRESHOLD = 3.5;
+export const INIT_HEALTH = 3;
 
 //monster-controller.ts
 export const MONSTER_WALK_SPEED = 0.2;

@@ -3,8 +3,9 @@ import { Level } from './level'
 import { TEXTURE_SCALE, ASSET_RES, } from './constants/constants'
 import { Tags, BlockType, GlobalAttribute, Assets, Direction, Attribute, Layer } from './constants/enums'
 import { PlayerController } from './player-controller'
+import { PlayerCollision } from './player-collision'
+import { PlayerStateUpdater } from './player-state-updater'
 import { MonsterController } from './monster-controller'
-import { MonsterCollision } from './monster-collision'
 import { Camera } from './camera'
 import { TextureChanger } from './texture-changer';
 
@@ -24,13 +25,33 @@ export class MapLoader {
             level.map.push([]);
             for (let x = 0; x < level.width; x++) {
                 if (level.tileTypesArr[y][x] === BlockType.WALL) {
-                    let sprite = new ECS.Sprite(`tile [${x},${y}]`, this.createTexture(0, 0, ASSET_RES, ASSET_RES));
+                    let sprite = new ECS.Sprite(`wall [${x},${y}]`, this.createTexture(0, 0, ASSET_RES, ASSET_RES));
                     sprite.scale.set(TEXTURE_SCALE);
                     sprite.position.x = x;
                     sprite.position.y = y;
                     sprite.addTag(Tags.GROUND);
                     map.addChild(sprite);
                     level.map[y].push(sprite);
+                }
+                else if (level.tileTypesArr[y][x] === BlockType.HEALTH_COIN){
+                    let sprite = new ECS.Sprite(`health coin [${x},${y}]`, this.createTexture(128, 0, ASSET_RES, ASSET_RES));
+                    sprite.scale.set(TEXTURE_SCALE);
+                    sprite.position.x = x;
+                    sprite.position.y = y;
+                    sprite.addTag(Tags.POWERUP);
+                    sprite.addTag(Tags.HEALTH_COIN);
+                    map.addChild(sprite);
+                    level.map[y].push(null);
+                }
+                else if (level.tileTypesArr[y][x] === BlockType.COIN){
+                    let sprite = new ECS.Sprite(`coin [${x},${y}]`, this.createTexture(160, 0, ASSET_RES, ASSET_RES));
+                    sprite.scale.set(TEXTURE_SCALE);
+                    sprite.position.x = x;
+                    sprite.position.y = y;
+                    sprite.addTag(Tags.POWERUP);
+                    sprite.addTag(Tags.COIN);
+                    map.addChild(sprite);
+                    level.map[y].push(null);
                 }
                 else if (level.tileTypesArr[y][x] === BlockType.PLAYER) {
                     //add player
@@ -60,9 +81,12 @@ export class MapLoader {
             .asSprite(this.createTexture(0, 32, ASSET_RES, ASSET_RES))
             .withParent(<ECS.Container>scene.stage.getChildByName(Layer.MAP_LAYER))
             .withComponent(new PlayerController())
+            .withComponent(new PlayerCollision())
+            .withComponent(new PlayerStateUpdater())
             .withComponent(new Camera())
             .withComponent(new TextureChanger(0, 32))
             .withAttribute(Attribute.DIRECTION, Direction.LEFT)
+            .withAttribute(Attribute.COINS, 0)
             .scale(TEXTURE_SCALE)
             .build();
     }
@@ -76,7 +100,6 @@ export class MapLoader {
             .asSprite(this.createTexture(0, 64, ASSET_RES, ASSET_RES))
             .withParent(<ECS.Container>scene.stage.getChildByName(Layer.MAP_LAYER))
             .withComponent(new MonsterController())
-            .withComponent(new MonsterCollision())
             .withComponent(new TextureChanger(0, 64))
             .withAttribute(Attribute.DIRECTION, Direction.LEFT)
             .scale(TEXTURE_SCALE)

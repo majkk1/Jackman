@@ -26,6 +26,7 @@ class MyGame {
 			.reset()
 			.add(Assets.SPRITESHEET, './assets/spritesheet.png')
 			.add(Assets.LEVELS, './assets/levels.txt')
+			.add(Assets.FONT, './assets/font/font.fnt')
 			.load(() => this.loadGame());
 	}
 

@@ -1,14 +1,17 @@
 export enum Assets {
     SPRITESHEET = 'spritesheet',
-    LEVELS = 'levels'
+    LEVELS = 'levels',
+    FONT = 'Early GameBoy'
 }
 
 export enum Attribute {
-    DIRECTION = 'direction'
+    DIRECTION = 'direction',
+    HEALTH = 'health',
+    COINS = 'coins'
 }
 
 export enum BlockType {
-    PLAYER, EMPTY, WALL, MONSTER
+    PLAYER, EMPTY, WALL, MONSTER, HEALTH_COIN, COIN
 }
 
 export enum Direction {
@@ -23,7 +26,8 @@ export enum GlobalAttribute {
 export enum Layer {
     MAP_LAYER = 'MapLayer',
     STATUSBAR = 'Statusbar',
-    HEALTHBAR = 'Healthbar'
+    HEALTHBAR = 'Healthbar',
+    COINBAR = 'Coinbar',
 }
 
 export enum Messages {
@@ -32,6 +36,8 @@ export enum Messages {
     HEALTH_INIT = 'Health init',
     HEALTH_ADD = 'Health add',
     HEALTH_REMOVE = 'Health remove',
+    COIN_ADD = 'coin add',
+    COIN_SET = 'coin set',
 
     PLAYER_DEAD = 'Player dead',
 }
@@ -43,8 +49,11 @@ export enum PlayerState {
 }
 
 export enum Tags {
-    PLAYER = 'player',
-    MONSTER = 'monster',
     GROUND = 'ground',
-    BULLET = 'bullet'
+    MONSTER = 'monster',
+    PLAYER = 'player',
+    BULLET = 'bullet',
+    POWERUP = 'powerup',
+    HEALTH_COIN = 'health coin',
+    COIN = 'coin',
 }

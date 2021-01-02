@@ -39,7 +39,8 @@ export class HealthbarController extends ECS.Component {
 
         let heart = new ECS.Sprite('heart', texture);
         heart.scale.set(TEXTURE_SCALE);
-        heart.x = this.hearts.length;
+        heart.anchor.set(1, 0);
+        heart.x = this.scene.width - this.hearts.length - 1;
 
         this.owner.addChild(heart);
         this.hearts.push(heart);
@@ -52,11 +53,11 @@ export class HealthbarController extends ECS.Component {
     }
 
     private removeHeart() {
+        if (this.hearts.length == 0) {
+            throw Error('No hearts left on screen.');
+        }
+
         let removedHeart = this.hearts.pop();
         removedHeart.destroy();
-
-        if (this.hearts.length == 0) {
-            this.sendMessage(Messages.PLAYER_DEAD);
-        }
     }
 }
