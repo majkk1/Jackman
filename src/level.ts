@@ -46,4 +46,7 @@ export class Level {
     get map() {
         return this._map;
     }
+    set map(map: ECS.Sprite[][]) {
+        this._map = map;
+    }
 }

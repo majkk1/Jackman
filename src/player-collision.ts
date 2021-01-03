@@ -1,6 +1,7 @@
 import * as ECS from '../libs/pixi-ecs';
 import { HEALTH_LIMIT, PLAYER_IMMORTALITY_TIME } from './constants/constants';
 import { Attribute, Messages, Tags } from './constants/enums'
+import { PlayerState } from './player-state-updater';
 
 export class PlayerCollision extends ECS.Component {
     playerBox: PIXI.Rectangle;
@@ -13,16 +14,19 @@ export class PlayerCollision extends ECS.Component {
         this.checkCollisionMonsters(absolute);
 
         //check for collision with powerups 
-        this.checkCollisionPowerups();
+        this.checkCollisionPowerupsKeys();
     }
 
-    private checkCollisionPowerups() {
+    private checkCollisionPowerupsKeys() {
         const powerups = this.scene.findObjectsByTag(Tags.POWERUP);
-        const collider = this.collideWith(powerups);
+        const keys = this.scene.findObjectsByTag(Tags.KEY);
+
+        const collider = this.collideWith([...powerups, ...keys]);
 
         if (collider !== null) {
             if (collider.hasTag(Tags.HEALTH_COIN)) {
-                if (this.owner.getAttribute(Attribute.HEALTH) < HEALTH_LIMIT) {
+                const health = this.owner.getAttribute<PlayerState>(Attribute.PLAYER_STATE).health;
+                if (health < HEALTH_LIMIT) {
                     this.sendMessage(Messages.HEALTH_ADD);
                     collider.destroy();
                 }
@@ -33,6 +37,18 @@ export class PlayerCollision extends ECS.Component {
             }
             else if (collider.hasTag(Tags.GUN)) {
                 this.sendMessage(Messages.GUN_TAKE);
+                collider.destroy();
+            }
+            else if (collider.hasTag(Tags.KEY)) {
+                if(collider.hasTag(Tags.BLUE)){
+                    this.sendMessage(Messages.KEY_TAKE,Tags.BLUE);
+                }
+                else if(collider.hasTag(Tags.GREEN)){
+                    this.sendMessage(Messages.KEY_TAKE,Tags.GREEN);
+                }
+                else {
+                    throw Error('Key sprite has not color tag set.');
+                }
                 collider.destroy();
             }
         }

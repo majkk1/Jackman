@@ -3,6 +3,7 @@ import { Attribute, Assets, Direction, Messages } from './constants/enums'
 import { BulletBuilder } from './bullet-builder';
 import { ASSET_RES } from './constants/constants';
 import { TextureChanger } from './texture-changer';
+import { PlayerState } from './player-state-updater';
 
 export class PlayerGun extends ECS.Component {
 
@@ -33,7 +34,7 @@ export class PlayerGun extends ECS.Component {
 	onUpdate() {
 		//if space is pushed -> fire
 		if (this.keyInputCmp.isKeyPressed(ECS.Keys.KEY_CTRL)) {
-			const ammo = this.owner.getAttribute(Attribute.AMMO);
+			const ammo = this.owner.getAttribute<PlayerState>(Attribute.PLAYER_STATE).ammo;
 			const direction = this.owner.getAttribute(Attribute.DIRECTION) as Direction;
 			if (ammo > 0) {
 				const bullet = new BulletBuilder(direction, this.owner, this.scene);

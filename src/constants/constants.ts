@@ -13,7 +13,11 @@ export const decodeLevelChar = {
     'M': BlockType.MONSTER,
     'h': BlockType.HEALTH_COIN,
     'c': BlockType.COIN,
-    'g': BlockType.GUN
+    'g': BlockType.GUN,
+    'Z': BlockType.BLUE_GATE,
+    'z': BlockType.BLUE_KEY,
+    'X': BlockType.GREEN_GATE,
+    'x': BlockType.GREEN_KEY,
 }
 
 //player-state-updater.ts

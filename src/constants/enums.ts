@@ -4,15 +4,17 @@ export enum Assets {
     FONT = 'Early GameBoy'
 }
 
+
 export enum Attribute {
     DIRECTION = 'direction',
-    HEALTH = 'health',
-    COINS = 'coins',
-    AMMO = 'ammo'
+    PLAYER_STATE = "player state"
 }
 
 export enum BlockType {
-    PLAYER, EMPTY, WALL, MONSTER, HEALTH_COIN, COIN, GUN
+    EMPTY, WALL,
+    PLAYER, MONSTER,
+    HEALTH_COIN, COIN, GUN,
+    BLUE_GATE, GREEN_GATE, BLUE_KEY, GREEN_KEY
 }
 
 export enum Direction {
@@ -29,7 +31,8 @@ export enum Layer {
     STATUSBAR = 'Statusbar',
     HEALTHBAR = 'Healthbar',
     COINBAR = 'Coinbar',
-    AMMOBAR = 'Ammobar'
+    AMMOBAR = 'Ammobar',
+    KEYBAR = 'Keybar',
 }
 
 export enum Messages {
@@ -47,6 +50,8 @@ export enum Messages {
     GUN_DROP = 'gun drop',
 
     PLAYER_DEAD = 'Player dead',
+    KEY_TAKE = 'key take',
+    KEY_USE = 'key use',
 }
 
 export enum PlayerState {
@@ -63,5 +68,9 @@ export enum Tags {
     POWERUP = 'powerup',
     HEALTH_COIN = 'health coin',
     COIN = 'coin',
-    GUN = 'gun'
+    GUN = 'gun',
+    KEY = 'key',
+    GATE = 'gate',
+    BLUE = 'blue',
+    GREEN = 'green',
 }

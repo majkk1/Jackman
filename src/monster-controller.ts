@@ -1,6 +1,6 @@
 import * as ECS from '../libs/pixi-ecs';
 import { DELTA_MUL } from './constants/constants'
-import { Direction, Attribute, GlobalAttribute, BlockType } from './constants/enums'
+import { Direction, Attribute, GlobalAttribute, BlockType, Tags } from './constants/enums'
 import { Level } from './level';
 import { MONSTER_WALK_SPEED } from './constants/constants'
 
@@ -38,10 +38,10 @@ export class MonsterController extends ECS.Component {
     private moveMonster(delta: number) {
         let x = this.owner.x;
         let y = this.owner.y;
-        let map = (<Level>this.scene.getGlobalAttribute(GlobalAttribute.LEVEL)).tileTypesArr;
+        let map = (<Level>this.scene.getGlobalAttribute(GlobalAttribute.LEVEL)).map;
 
         if (this.direction == Direction.LEFT) {
-            if (map[y][Math.floor(x)] != BlockType.WALL && map[y + 1][Math.floor(x)] == BlockType.WALL) {
+            if (map[y][Math.floor(x)] == null && map[y + 1][Math.floor(x)] != null) {
                 this.owner.x -= delta * MONSTER_WALK_SPEED;
             }
             else {
@@ -50,7 +50,7 @@ export class MonsterController extends ECS.Component {
         }
 
         else if (this.direction == Direction.RIGHT) {
-            if (map[y][Math.ceil(x)] != BlockType.WALL && map[y + 1][Math.ceil(x)] == BlockType.WALL) {
+            if (map[y][Math.ceil(x)] == null && map[y + 1][Math.ceil(x)] != null) {
                 this.owner.x += delta * MONSTER_WALK_SPEED;
             }
             else {
