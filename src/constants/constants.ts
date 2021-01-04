@@ -18,6 +18,11 @@ export const decodeLevelChar = {
     'z': BlockType.BLUE_KEY,
     'X': BlockType.GREEN_GATE,
     'x': BlockType.GREEN_KEY,
+    '0': BlockType.INFO0,
+    '1': BlockType.INFO1,
+    '2': BlockType.INFO2,
+    '3': BlockType.INFO3,
+    '4': BlockType.INFO4,
 }
 
 //player-state-updater.ts
@@ -42,3 +47,5 @@ export const CAMERA_Y_BORDER = 8;
 
 // statusbar/healthbar-controller.ts
 export const HEALTH_LIMIT = 10;
+
+export const INFOBOX_TIMER = 2000;

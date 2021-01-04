@@ -18,6 +18,10 @@ export class LevelParser {
                 levelBuilder.name = line.substr(1);
                 return;
             }
+            else if (line.match(/^\d\ /)) {
+                levelBuilder.infoTexts.push(line.substr(2));
+                return;
+            }
 
             let xPos = 0;
 
@@ -28,8 +32,10 @@ export class LevelParser {
 
                 let decodedCharacter = decodeLevelChar[character];
                 if (decodedCharacter !== undefined) {
-
                     levelBuilder.tileTypesArr[levelBuilder.sizeY].push(decodedCharacter);
+                }
+                else {
+                    throw Error(`Bad formating: ${character}`)
                 }
 
                 if (levelBuilder.sizeY === 0) {
@@ -42,7 +48,6 @@ export class LevelParser {
                 levelBuilder.tileTypesArr.push(new Array());
                 levelBuilder.sizeY++;
             }
-
         });
 
         if (levelBuilder) {

@@ -4,17 +4,29 @@ export enum Assets {
     FONT = 'Early GameBoy'
 }
 
-
 export enum Attribute {
     DIRECTION = 'direction',
     PLAYER_STATE = "player state"
 }
 
 export enum BlockType {
-    EMPTY, WALL,
-    PLAYER, MONSTER,
-    HEALTH_COIN, COIN, GUN,
-    BLUE_GATE, GREEN_GATE, BLUE_KEY, GREEN_KEY
+    EMPTY = 'EMPTY',
+    WALL = 'WALL',
+    PLAYER = 'PLAYER',
+    MONSTER = 'MONSTER',
+    HEALTH_COIN = 'HEALTH_COIN',
+    COIN = 'COIN',
+    GUN = 'GUN',
+    BLUE_GATE = 'BLUE_GATE',
+    GREEN_GATE = 'GREEN_GATE',
+    BLUE_KEY = 'BLUE_KEY',
+    GREEN_KEY = 'GREEN_KEY',
+    INFO = "INFO",
+    INFO0 = 'INFO0',
+    INFO1 = 'INFO1',
+    INFO2 = 'INFO2',
+    INFO3 = 'INFO3',
+    INFO4 = 'INFO4',
 }
 
 export enum Direction {
@@ -33,7 +45,9 @@ export enum Layer {
     COINBAR = 'Coinbar',
     AMMOBAR = 'Ammobar',
     KEYBAR = 'Keybar',
+    INFOBOX = "Infobox"
 }
+
 
 export enum Messages {
     RESTART_LEVEL = 'Restart level',
@@ -52,6 +66,9 @@ export enum Messages {
     PLAYER_DEAD = 'Player dead',
     KEY_TAKE = 'key take',
     KEY_USE = 'key use',
+
+    REMOVE_INFOBOX = 'remove infobox',
+    RESET_INFOBOX = "RESET_INFOBOX"
 }
 
 export enum PlayerState {
@@ -73,4 +90,5 @@ export enum Tags {
     GATE = 'gate',
     BLUE = 'blue',
     GREEN = 'green',
+    INFO = "info"
 }

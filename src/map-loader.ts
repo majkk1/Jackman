@@ -1,6 +1,6 @@
 import * as ECS from '../libs/pixi-ecs';
 import { Level } from './level'
-import { TEXTURE_SCALE, ASSET_RES, } from './constants/constants'
+import { TEXTURE_SCALE } from './constants/constants'
 import { Tags, BlockType, GlobalAttribute, Assets, Direction, Attribute, Layer } from './constants/enums'
 import { PlayerController } from './player-controller'
 import { PlayerCollision } from './player-collision'
@@ -8,6 +8,7 @@ import { PlayerStateUpdater } from './player-state-updater'
 import { MonsterController } from './monster-controller'
 import { Camera } from './camera'
 import { TextureChanger } from './texture-changer';
+import { SpritesheetInfo } from './constants/spritesheet';
 
 export class MapLoader {
 
@@ -15,110 +16,41 @@ export class MapLoader {
         scene.assignGlobalAttribute(GlobalAttribute.LEVEL, level);
 
         //create map
-        let map = new ECS.Container(Layer.MAP_LAYER);
-        scene.stage.addChild(map);
+        let mapLayer = new ECS.Container(Layer.MAP_LAYER);
+        scene.stage.addChild(mapLayer);
 
         let playerX: number;
         let playerY: number;
 
         level.map = [];
-        
+
         for (let y = 0; y < level.height; y++) {
             level.map.push([]);
             for (let x = 0; x < level.width; x++) {
-                if (level.tileTypesArr[y][x] === BlockType.WALL) {
-                    let sprite = new ECS.Sprite(`wall [${x},${y}]`, this.createTexture(0, 0, ASSET_RES, ASSET_RES));
-                    sprite.scale.set(TEXTURE_SCALE);
-                    sprite.position.x = x;
-                    sprite.position.y = y;
-                    sprite.addTag(Tags.GROUND);
-                    map.addChild(sprite);
-                    level.map[y].push(sprite);
+                let blockType = level.tileTypesArr[y][x];
+                level.map[y][x] = null;
+
+                if (blockType === BlockType.EMPTY) {
+                    continue;
                 }
-                else if (level.tileTypesArr[y][x] === BlockType.HEALTH_COIN) {
-                    let sprite = new ECS.Sprite(`health coin [${x},${y}]`, this.createTexture(128, 0, ASSET_RES, ASSET_RES));
-                    sprite.scale.set(TEXTURE_SCALE);
-                    sprite.position.x = x;
-                    sprite.position.y = y;
-                    sprite.addTag(Tags.POWERUP);
-                    sprite.addTag(Tags.HEALTH_COIN);
-                    map.addChild(sprite);
-                    level.map[y].push(null);
-                }
-                else if (level.tileTypesArr[y][x] === BlockType.COIN) {
-                    let sprite = new ECS.Sprite(`coin [${x},${y}]`, this.createTexture(160, 0, ASSET_RES, ASSET_RES));
-                    sprite.scale.set(TEXTURE_SCALE);
-                    sprite.position.x = x;
-                    sprite.position.y = y;
-                    sprite.addTag(Tags.POWERUP);
-                    sprite.addTag(Tags.COIN);
-                    map.addChild(sprite);
-                    level.map[y].push(null);
-                }
-                else if (level.tileTypesArr[y][x] === BlockType.GUN) {
-                    let sprite = new ECS.Sprite(`gun [${x},${y}]`, this.createTexture(192, 0, ASSET_RES, ASSET_RES));
-                    sprite.scale.set(TEXTURE_SCALE);
-                    sprite.position.x = x;
-                    sprite.position.y = y;
-                    sprite.addTag(Tags.POWERUP);
-                    sprite.addTag(Tags.GUN);
-                    map.addChild(sprite);
-                    level.map[y].push(null);
-                }
-                else if (level.tileTypesArr[y][x] === BlockType.BLUE_GATE) {
-                    let sprite = new ECS.Sprite(`blue gate [${x},${y}]`, this.createTexture(0, 64, ASSET_RES, ASSET_RES));
-                    sprite.scale.set(TEXTURE_SCALE);
-                    sprite.position.x = x;
-                    sprite.position.y = y;
-                    sprite.addTag(Tags.GROUND);
-                    sprite.addTag(Tags.GATE);
-                    sprite.addTag(Tags.BLUE);
-                    map.addChild(sprite);
-                    level.map[y].push(sprite);
-                }
-                else if (level.tileTypesArr[y][x] === BlockType.GREEN_GATE) {
-                    let sprite = new ECS.Sprite(`green gate [${x},${y}]`, this.createTexture(32, 64, ASSET_RES, ASSET_RES));
-                    sprite.scale.set(TEXTURE_SCALE);
-                    sprite.position.x = x;
-                    sprite.position.y = y;
-                    sprite.addTag(Tags.GROUND);
-                    sprite.addTag(Tags.GATE);
-                    sprite.addTag(Tags.GREEN);
-                    map.addChild(sprite);
-                    level.map[y].push(sprite);
-                }
-                else if (level.tileTypesArr[y][x] === BlockType.BLUE_KEY) {
-                    let sprite = new ECS.Sprite(`blue key [${x},${y}]`, this.createTexture(64, 64, ASSET_RES, ASSET_RES / 2));
-                    sprite.scale.set(TEXTURE_SCALE);
-                    sprite.position.x = x;
-                    sprite.position.y = y;
-                    sprite.addTag(Tags.KEY);
-                    sprite.addTag(Tags.BLUE);
-                    map.addChild(sprite);
-                    level.map[y].push(null);
-                }
-                else if (level.tileTypesArr[y][x] === BlockType.GREEN_KEY) {
-                    let sprite = new ECS.Sprite(`green key [${x},${y}]`, this.createTexture(64, 80, ASSET_RES, ASSET_RES / 2));
-                    sprite.scale.set(TEXTURE_SCALE);
-                    sprite.position.x = x;
-                    sprite.position.y = y;
-                    sprite.addTag(Tags.KEY);
-                    sprite.addTag(Tags.GREEN);
-                    map.addChild(sprite);
-                    level.map[y].push(null);
-                }
-                else if (level.tileTypesArr[y][x] === BlockType.PLAYER) {
+                else if (blockType === BlockType.PLAYER) {
                     //add player
                     playerX = x;
                     playerY = y;
-                    level.map[y].push(null);
                 }
-                else if (level.tileTypesArr[y][x] === BlockType.MONSTER) {
+                else if (blockType === BlockType.MONSTER) {
+                    //add monster
                     this.buildMonster(x, y, scene);
-                    level.map[y].push(null);
+                    continue;
+                }
+                else if (blockType.substring(0, 4) === BlockType.INFO) {
+                    //add infoblock
+                    this.buildInfo(x, y, level, blockType, mapLayer);
+                    continue;
                 }
                 else {
-                    level.map[y].push(null);
+                    //add anotherblock
+                    this.buildSprite(x, y, level, blockType, mapLayer);
                 }
             }
         }
@@ -130,13 +62,85 @@ export class MapLoader {
         this.buildPlayer(playerX, playerY, scene);
     }
 
+    private addTags(sprite: ECS.Sprite, blockType: BlockType) {
+        switch (blockType) {
+            case BlockType.WALL:
+                sprite.addTag(Tags.GROUND);
+                break;
+
+            case BlockType.HEALTH_COIN:
+                sprite.addTag(Tags.POWERUP);
+                sprite.addTag(Tags.HEALTH_COIN);
+                break;
+
+            case BlockType.COIN:
+                sprite.addTag(Tags.POWERUP);
+                sprite.addTag(Tags.COIN);
+                break;
+
+            case BlockType.GUN:
+                sprite.addTag(Tags.POWERUP);
+                sprite.addTag(Tags.GUN);
+                break;
+
+            case BlockType.BLUE_GATE:
+                sprite.addTag(Tags.GROUND);
+                sprite.addTag(Tags.GATE);
+                sprite.addTag(Tags.BLUE);
+                break;
+
+            case BlockType.GREEN_GATE:
+                sprite.addTag(Tags.GROUND);
+                sprite.addTag(Tags.GATE);
+                sprite.addTag(Tags.GREEN);
+                break;
+
+            case BlockType.BLUE_KEY:
+                sprite.addTag(Tags.KEY);
+                sprite.addTag(Tags.BLUE);
+                break;
+
+            case BlockType.GREEN_KEY:
+                sprite.addTag(Tags.KEY);
+                sprite.addTag(Tags.GREEN);
+                break;
+        }
+    }
+
+    private buildSprite(x: number, y: number, level: Level, blockType: BlockType, mapLayer: ECS.Container) {
+        const textureInfo = SpritesheetInfo[blockType];
+
+        let sprite = new ECS.Sprite(blockType + ` [${x},${y}]`, this.createTexture(textureInfo.x, textureInfo.y, textureInfo.width, textureInfo.height));
+        sprite.scale.set(TEXTURE_SCALE);
+        sprite.position.x = x;
+        sprite.position.y = y;
+        this.addTags(sprite, blockType);
+        mapLayer.addChild(sprite);
+
+        if (!(sprite.hasTag(Tags.POWERUP) || sprite.hasTag(Tags.KEY))) {
+            level.map[y][x] = sprite;
+        }
+    }
+
+    private buildInfo(x: number, y: number, level: Level, blockType: BlockType, mapLayer: ECS.Container) {
+        let textureInfo = SpritesheetInfo[BlockType.INFO];
+        let sprite = new ECS.Sprite(level.infoTexts[blockType.substring(4, 5)], this.createTexture(textureInfo.x, textureInfo.y, textureInfo.width, textureInfo.height));
+
+        sprite.scale.set(TEXTURE_SCALE);
+        sprite.position.x = x;
+        sprite.position.y = y;
+        sprite.addTag(Tags.INFO);
+        mapLayer.addChild(sprite);
+    }
+
     private buildPlayer(x: number, y: number, scene: ECS.Scene) {
+        let textureInfo = SpritesheetInfo[BlockType.PLAYER];
         new ECS.Builder(scene)
             .anchor(0, 0)
             .localPos(x, y)
-            .withName('Player')
+            .withName(BlockType.PLAYER)
             .withTag(Tags.PLAYER)
-            .asSprite(this.createTexture(0, 32, ASSET_RES, ASSET_RES))
+            .asSprite(this.createTexture(textureInfo.x, textureInfo.y, textureInfo.width, textureInfo.height))
             .withParent(<ECS.Container>scene.stage.getChildByName(Layer.MAP_LAYER))
             .withComponent(new PlayerController())
             .withComponent(new PlayerCollision())
@@ -149,12 +153,13 @@ export class MapLoader {
     }
 
     private buildMonster(x: number, y: number, scene: ECS.Scene) {
+        let textureInfo = SpritesheetInfo[BlockType.MONSTER];
         new ECS.Builder(scene)
             .anchor(0, 0)
             .localPos(x, y)
-            .withName('Monster')
+            .withName(BlockType.MONSTER)
             .withTag(Tags.MONSTER)
-            .asSprite(this.createTexture(32, 32, ASSET_RES, ASSET_RES))
+            .asSprite(this.createTexture(textureInfo.x, textureInfo.y, textureInfo.width, textureInfo.height))
             .withParent(<ECS.Container>scene.stage.getChildByName(Layer.MAP_LAYER))
             .withComponent(new MonsterController())
             .withComponent(new TextureChanger())

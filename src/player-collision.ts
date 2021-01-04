@@ -1,11 +1,15 @@
 import * as ECS from '../libs/pixi-ecs';
-import { HEALTH_LIMIT, PLAYER_IMMORTALITY_TIME } from './constants/constants';
+import { HEALTH_LIMIT, INFOBOX_TIMER, PLAYER_IMMORTALITY_TIME } from './constants/constants';
 import { Attribute, Messages, Tags } from './constants/enums'
 import { PlayerState } from './player-state-updater';
+import { InfoboxController } from './infobox-controller';
 
 export class PlayerCollision extends ECS.Component {
     playerBox: PIXI.Rectangle;
     lastCollisionMonster: number = 0;
+    isOnInfobox: boolean = false;
+    lastInfoboxColider: ECS.Container;
+    lastInfoboxController: ECS.Component;
 
     onUpdate(delta: number, absolute: number) {
         this.playerBox = this.owner.getBounds();
@@ -15,6 +19,39 @@ export class PlayerCollision extends ECS.Component {
 
         //check for collision with powerups 
         this.checkCollisionPowerupsKeys();
+
+        //check for collision with infobox
+        this.checkCollisionInfobox();
+    }
+
+    private checkCollisionInfobox() {
+        const infoBox = this.scene.findObjectsByTag(Tags.INFO);
+        const collider = this.collideWith(infoBox);
+
+        if (collider !== null) {
+            if (this.lastInfoboxColider !== collider) {
+                //if collision with new collider, find or create controller
+                let controller = collider.findComponentByName(InfoboxController.name);
+                if (controller) {
+                    //if this controller exists, reset its timer
+                    this.sendMessage(Messages.RESET_INFOBOX, controller.id);
+                }
+                else {
+                    //else create mew controller
+                    controller = new InfoboxController(collider.asSprite());
+                    collider.asSprite().addComponent(controller);
+                }
+                this.lastInfoboxController = controller;
+            }
+        }
+        else {
+            if (this.lastInfoboxController) {
+                //if go outside of infobox area, start timer to remove msg
+                this.sendMessage(Messages.REMOVE_INFOBOX, this.lastInfoboxController.id);
+                this.lastInfoboxController = null;
+            }
+        }
+        this.lastInfoboxColider = collider;
     }
 
     private checkCollisionPowerupsKeys() {
@@ -40,11 +77,11 @@ export class PlayerCollision extends ECS.Component {
                 collider.destroy();
             }
             else if (collider.hasTag(Tags.KEY)) {
-                if(collider.hasTag(Tags.BLUE)){
-                    this.sendMessage(Messages.KEY_TAKE,Tags.BLUE);
+                if (collider.hasTag(Tags.BLUE)) {
+                    this.sendMessage(Messages.KEY_TAKE, Tags.BLUE);
                 }
-                else if(collider.hasTag(Tags.GREEN)){
-                    this.sendMessage(Messages.KEY_TAKE,Tags.GREEN);
+                else if (collider.hasTag(Tags.GREEN)) {
+                    this.sendMessage(Messages.KEY_TAKE, Tags.GREEN);
                 }
                 else {
                     throw Error('Key sprite has not color tag set.');
