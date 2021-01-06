@@ -1,13 +1,12 @@
 import * as ECS from '../libs/pixi-ecs';
 import { DELTA_MUL, GRAVITY, JUMP_TRESHOLD, PLAYER_JUMP_SIZE, PLAYER_WALK_SPEED } from './constants/constants'
-import { Attribute, Direction, GlobalAttribute, Messages, PlayerState } from './constants/enums'
+import { Attribute, Direction, GlobalAttribute, PlayerMoveState } from './constants/enums'
 import { Vector2 } from './utils/vector2';
 import { Level } from './level';
-import { BulletBuilder } from './bullet-builder';
 
 export class PlayerController extends ECS.Component {
 
-	playerState: PlayerState = PlayerState.STAND;
+	playerMoveState: PlayerMoveState = PlayerMoveState.STAND;
 	isOnGround: boolean = false;
 	oldY: number;
 	jumpLen: number = 0;
@@ -23,7 +22,7 @@ export class PlayerController extends ECS.Component {
 		let deltaMul = delta * DELTA_MUL;
 
 		//update player state, add movement 
-		this.updatePlayerState(deltaMul, absolute);
+		this.updatePlayerMoveState(deltaMul, absolute);
 
 		//add gravity (if not on ground or not going up)
 		if ((!this.isOnGround || this.speed.x != 0) && !this.inJump) {
@@ -37,27 +36,27 @@ export class PlayerController extends ECS.Component {
 		this.owner.assignAttribute(Attribute.DIRECTION, this.direction)
 	}
 
-	updatePlayerState(delta: number, absolute: number) {
+	updatePlayerMoveState(delta: number, absolute: number) {
 		const keyInputCmp = this.scene.findGlobalComponentByName<ECS.KeyInputComponent>(ECS.KeyInputComponent.name);
 
-		switch (this.playerState) {
-			case PlayerState.STAND:
+		switch (this.playerMoveState) {
+			case PlayerMoveState.STAND:
 				//if left or right arrow but not both -> goto WALK state
 				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) || keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
 					if (!(keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT))) {
-						this.playerState = PlayerState.WALK;
+						this.playerMoveState = PlayerMoveState.WALK;
 					}
 				}
 				//if space -> goto JUMP
 				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_SPACE)) {
-					this.playerState = PlayerState.JUMP;
+					this.playerMoveState = PlayerMoveState.JUMP;
 				}
 				break;
 
-			case PlayerState.WALK:
+			case PlayerMoveState.WALK:
 				//space pushed -> goto JUMP
 				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_SPACE)) {
-					this.playerState = PlayerState.JUMP;
+					this.playerMoveState = PlayerMoveState.JUMP;
 				}
 				//only left key pushed -> move left
 				else if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
@@ -73,11 +72,11 @@ export class PlayerController extends ECS.Component {
 				}
 				//nothing happened
 				else {
-					this.playerState = PlayerState.STAND;
+					this.playerMoveState = PlayerMoveState.STAND;
 				}
 				break;
 
-			case PlayerState.JUMP:
+			case PlayerMoveState.JUMP:
 				//move left
 				if (keyInputCmp.isKeyPressed(ECS.Keys.KEY_LEFT) && !keyInputCmp.isKeyPressed(ECS.Keys.KEY_RIGHT)) {
 					this.direction = Direction.LEFT;
@@ -118,7 +117,7 @@ export class PlayerController extends ECS.Component {
 
 				//no jump && on the ground 
 				if (this.isOnGround && this.inJump == false) {
-					this.playerState = PlayerState.STAND;
+					this.playerMoveState = PlayerMoveState.STAND;
 				}
 				break;
 		}

@@ -8,6 +8,7 @@ export const DELTA_MUL = 0.01;
 //Decoding table for level file
 export const decodeLevelChar = {
     'P': BlockType.PLAYER,
+    ' ': BlockType.EMPTY,
     '.': BlockType.EMPTY,
     '#': BlockType.WALL,
     'M': BlockType.MONSTER,
@@ -18,11 +19,17 @@ export const decodeLevelChar = {
     'z': BlockType.BLUE_KEY,
     'X': BlockType.GREEN_GATE,
     'x': BlockType.GREEN_KEY,
+    '@': BlockType.EXIT_DOOR,
     '0': BlockType.INFO0,
     '1': BlockType.INFO1,
     '2': BlockType.INFO2,
     '3': BlockType.INFO3,
     '4': BlockType.INFO4,
+    '5': BlockType.INFO5,
+    '6': BlockType.INFO6,
+    '7': BlockType.INFO7,
+    '8': BlockType.INFO8,
+    '9': BlockType.INFO9,
 }
 
 //player-state-updater.ts

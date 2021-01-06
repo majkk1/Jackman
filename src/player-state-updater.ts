@@ -24,7 +24,7 @@ export interface PlayerState {
 export class PlayerStateUpdater extends ECS.Component {
 
 	state: PlayerState = {
-		health: 0,
+		health: INIT_HEALTH,
 		coins: 0,
 		hasGun: false,
 		ammo: 0,
@@ -32,25 +32,28 @@ export class PlayerStateUpdater extends ECS.Component {
 			hasBlueKey: false,
 			hasGreenKey: false
 		}
-
 	};
 
 	onInit() {
-		this.subscribe(Messages.HEALTH_INIT);
 		this.subscribe(Messages.HEALTH_ADD);
 		this.subscribe(Messages.HEALTH_REMOVE);
 		this.subscribe(Messages.COIN_ADD);
 		this.subscribe(Messages.GUN_TAKE);
 		this.subscribe(Messages.GUN_FIRE);
 		this.subscribe(Messages.KEY_TAKE);
+		
+		//if player is saved, load it
+		const savedPlayerState = this.owner.getAttribute(Attribute.PLAYER_STATE) as PlayerState;
+		if (savedPlayerState){
+			this.state = savedPlayerState;
+		}
 
-		//initialize health
-		this.state.health = INIT_HEALTH;
-		this.sendMessage(Messages.HEALTH_INIT, INIT_HEALTH);
-
-		//initialize coins
-		this.state.coins = 0;
+		//initialize statusbars
+		this.sendMessage(Messages.HEALTH_SET, this.state.health);
 		this.sendMessage(Messages.COIN_SET, this.state.coins);
+		if(this.state.hasGun){
+			this.owner.addComponent(new PlayerGun());
+		}
 	}
 
 	onRemove() {
@@ -59,16 +62,14 @@ export class PlayerStateUpdater extends ECS.Component {
 
 	onMessage(msg: ECS.Message) {
 		switch (msg.action) {
-			case Messages.HEALTH_INIT:
-				this.state.health = msg.data;
-				break;
-
 			case Messages.HEALTH_ADD:
 				this.state.health++;
+				this.sendMessage(Messages.HEALTH_SET,this.state.health);
 				break;
 
 			case Messages.HEALTH_REMOVE:
 				this.state.health--;
+				this.sendMessage(Messages.HEALTH_SET,this.state.health);
 				this.owner.addComponent(new BlinkingSprite(PLAYER_IMMORTALITY_TIME)); //blinking animation
 				if (this.state.health == 0) {
 					this.sendMessage(Messages.PLAYER_DEAD);

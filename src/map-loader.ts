@@ -1,10 +1,10 @@
 import * as ECS from '../libs/pixi-ecs';
 import { Level } from './level'
-import { TEXTURE_SCALE } from './constants/constants'
+import { decodeLevelChar, TEXTURE_SCALE } from './constants/constants'
 import { Tags, BlockType, GlobalAttribute, Assets, Direction, Attribute, Layer } from './constants/enums'
 import { PlayerController } from './player-controller'
 import { PlayerCollision } from './player-collision'
-import { PlayerStateUpdater } from './player-state-updater'
+import { PlayerState, PlayerStateUpdater } from './player-state-updater'
 import { MonsterController } from './monster-controller'
 import { Camera } from './camera'
 import { TextureChanger } from './texture-changer';
@@ -12,7 +12,7 @@ import { SpritesheetInfo } from './constants/spritesheet';
 
 export class MapLoader {
 
-    loadLevel(level: Level, scene: ECS.Scene) {
+    loadLevel(level: Level, scene: ECS.Scene, playerState?: PlayerState) {
         scene.assignGlobalAttribute(GlobalAttribute.LEVEL, level);
 
         //create map
@@ -30,6 +30,10 @@ export class MapLoader {
                 let blockType = level.tileTypesArr[y][x];
                 level.map[y][x] = null;
 
+                if(blockType === undefined){
+                    throw Error(`Some chars are missing in map (position [${x},${y}])`)    
+                }
+                
                 if (blockType === BlockType.EMPTY) {
                     continue;
                 }
@@ -59,7 +63,7 @@ export class MapLoader {
             throw Error(`Player not found on map ${level.name}`);
         }
 
-        this.buildPlayer(playerX, playerY, scene);
+        this.buildPlayer(playerX, playerY, scene, playerState);
     }
 
     private addTags(sprite: ECS.Sprite, blockType: BlockType) {
@@ -104,6 +108,10 @@ export class MapLoader {
                 sprite.addTag(Tags.KEY);
                 sprite.addTag(Tags.GREEN);
                 break;
+            
+            case BlockType.EXIT_DOOR:
+                sprite.addTag(Tags.EXIT_DOOR);
+                break;
         }
     }
 
@@ -117,7 +125,7 @@ export class MapLoader {
         this.addTags(sprite, blockType);
         mapLayer.addChild(sprite);
 
-        if (!(sprite.hasTag(Tags.POWERUP) || sprite.hasTag(Tags.KEY))) {
+        if (!(sprite.hasTag(Tags.POWERUP) || sprite.hasTag(Tags.KEY) || sprite.hasTag(Tags.EXIT_DOOR))) {
             level.map[y][x] = sprite;
         }
     }
@@ -133,9 +141,9 @@ export class MapLoader {
         mapLayer.addChild(sprite);
     }
 
-    private buildPlayer(x: number, y: number, scene: ECS.Scene) {
+    private buildPlayer(x: number, y: number, scene: ECS.Scene, playerState?: PlayerState) {
         let textureInfo = SpritesheetInfo[BlockType.PLAYER];
-        new ECS.Builder(scene)
+        let player = new ECS.Builder(scene)
             .anchor(0, 0)
             .localPos(x, y)
             .withName(BlockType.PLAYER)
@@ -148,6 +156,7 @@ export class MapLoader {
             .withComponent(new Camera())
             .withComponent(new TextureChanger())
             .withAttribute(Attribute.DIRECTION, Direction.LEFT)
+            .withAttribute(Attribute.PLAYER_STATE, playerState)
             .scale(TEXTURE_SCALE)
             .build();
     }

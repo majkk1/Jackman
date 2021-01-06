@@ -22,6 +22,20 @@ export class PlayerCollision extends ECS.Component {
 
         //check for collision with infobox
         this.checkCollisionInfobox();
+
+        //check for collision with infobox
+        this.checkCollisionExitdoor();
+    }
+
+    private checkCollisionExitdoor(){
+        const exit = this.scene.findObjectsByTag(Tags.EXIT_DOOR);
+        const collider = this.collideWith(exit); 
+
+        if(collider){
+            this.sendMessage(Messages.LEVEL_DONE);
+            console.log('level done');
+            collider.removeTag(Tags.EXIT_DOOR); //sent message only once
+        }
     }
 
     private checkCollisionInfobox() {

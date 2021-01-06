@@ -7,24 +7,19 @@ export class HealthbarController extends ECS.Component {
     hearts: ECS.Sprite[] = [];
 
     onInit() {
-        this.subscribe(Messages.HEALTH_INIT);
-        this.subscribe(Messages.HEALTH_ADD);
-        this.subscribe(Messages.HEALTH_REMOVE);
+        this.subscribe(Messages.HEALTH_SET)
     }
 
     onMessage(msg: ECS.Message) {
-        switch (msg.action) {
-            case Messages.HEALTH_INIT:
-                this.addHearts(<number>msg.data);
-                break;
+        if(msg.action === Messages.HEALTH_SET){
+            const diff = msg.data - this.hearts.length;
 
-            case Messages.HEALTH_ADD:
-                this.addHeart();
-                break;
-
-            case Messages.HEALTH_REMOVE:
-                this.removeHeart();
-                break;
+            if(diff > 0){
+                this.addHearts(diff);
+            }
+            else if(diff < 0){
+                this.removeHearts(Math.abs(diff));
+            }
         }
     }
 
@@ -59,5 +54,11 @@ export class HealthbarController extends ECS.Component {
 
         let removedHeart = this.hearts.pop();
         removedHeart.destroy();
+    }
+
+    private removeHearts(number: number){
+        for (let i = 0; i < number; i++) {
+            this.removeHeart();
+        }
     }
 }

@@ -21,12 +21,19 @@ export enum BlockType {
     GREEN_GATE = 'GREEN_GATE',
     BLUE_KEY = 'BLUE_KEY',
     GREEN_KEY = 'GREEN_KEY',
+    EXIT_DOOR = 'EXIT_DOOR',
     INFO = "INFO",
     INFO0 = 'INFO0',
     INFO1 = 'INFO1',
     INFO2 = 'INFO2',
     INFO3 = 'INFO3',
     INFO4 = 'INFO4',
+    INFO5 = 'INFO5',
+    INFO6 = 'INFO6',
+    INFO7 = 'INFO7',
+    INFO8 = 'INFO8',
+    INFO9 = 'INFO9',
+
 }
 
 export enum Direction {
@@ -49,12 +56,15 @@ export enum Layer {
 }
 
 
+
+
 export enum Messages {
     RESTART_LEVEL = 'Restart level',
+    LEVEL_DONE = 'Level done',
 
-    HEALTH_INIT = 'Health init',
     HEALTH_ADD = 'Health add',
     HEALTH_REMOVE = 'Health remove',
+    HEALTH_SET = 'Health set',
     COIN_ADD = 'coin add',
     COIN_SET = 'coin set',
 
@@ -68,10 +78,10 @@ export enum Messages {
     KEY_USE = 'key use',
 
     REMOVE_INFOBOX = 'remove infobox',
-    RESET_INFOBOX = "RESET_INFOBOX"
+    RESET_INFOBOX = "RESET_INFOBOX",
 }
 
-export enum PlayerState {
+export enum PlayerMoveState {
     STAND = 'STAND',
     WALK = 'WALK',
     JUMP = 'JUMP',
@@ -90,5 +100,6 @@ export enum Tags {
     GATE = 'gate',
     BLUE = 'blue',
     GREEN = 'green',
+    EXIT_DOOR = 'exit_door',
     INFO = "info"
 }

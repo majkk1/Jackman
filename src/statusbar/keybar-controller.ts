@@ -30,7 +30,7 @@ export class KeybarController extends ECS.Component {
             case Messages.KEY_USE:
                 this.removeKey(msg.data);
                 break;
-        }
+         }
     }
 
     private addKey(color: Tags) {
