@@ -44,6 +44,7 @@ export enum GlobalAttribute {
     LEVEL = 'level'
 }
 
+
 export enum Layer {
     MAP_LAYER = 'MapLayer',
     STATUSBAR = 'Statusbar',
@@ -51,10 +52,13 @@ export enum Layer {
     COINBAR = 'Coinbar',
     AMMOBAR = 'Ammobar',
     KEYBAR = 'Keybar',
-    INFOBOX = "Infobox"
+    INFOBOX = "Infobox",
+    LEVEL_NAME = "Level Name Layer"
 }
 
+
 export enum Messages {
+    RUN_LEVEL = "Run level",
     RESTART_LEVEL = 'Restart level',
     LEVEL_DONE = 'Level done',
 

@@ -98,7 +98,6 @@ export class PlayerStateUpdater extends ECS.Component {
 				break;
 		}
 		this.owner.assignAttribute(Attribute.PLAYER_STATE, this.state);
-		console.log(this.state);
 	}
 
 }

@@ -6,14 +6,18 @@ import { Level } from './level';
 import { StatusbarBuilder } from './statusbar/statusbar-builder';
 import { Attribute } from './constants/enums';
 import { PlayerState } from './player-state-updater';
+import { ScreenLevelName } from './screen-level-name';
 
 export class StageManager extends ECS.Component {
 
     levels: Level[];
+
     currentLevelNumber: number;
+    playerState: PlayerState;
 
     onInit() {
         //subscribe control messages
+        this.subscribe(Messages.RUN_LEVEL);
         this.subscribe(Messages.PLAYER_DEAD);
         this.subscribe(Messages.LEVEL_DONE);
 
@@ -27,21 +31,28 @@ export class StageManager extends ECS.Component {
 
         //load first level
         this.currentLevelNumber = 0;
-        this.loadLevel(this.currentLevelNumber);
+        this.loadLevelName();
     }
 
     onMessage(msg: ECS.Message) {
+        console.log('msg: ',msg)
         switch (msg.action) {
+            case Messages.RUN_LEVEL:
+                this.runLevel();
+                break;
+
+
             case Messages.PLAYER_DEAD:
                 this.scene.findObjectByName(Layer.MAP_LAYER).destroy();
-                this.loadLevel(this.currentLevelNumber);
+                this.playerState = null;
+                this.runLevel();
                 break;
 
             case Messages.LEVEL_DONE:
                 this.currentLevelNumber++;
 
                 const player = this.scene.findObjectByTag(Tags.PLAYER);
-                const playerState = player.getAttribute(Attribute.PLAYER_STATE) as PlayerState;
+                this.playerState = player.getAttribute(Attribute.PLAYER_STATE) as PlayerState;
 
                 //if player win last level
                 if (this.currentLevelNumber == this.levels.length) {
@@ -50,7 +61,7 @@ export class StageManager extends ECS.Component {
                 }
 
                 this.scene.findObjectByName(Layer.MAP_LAYER).destroy();
-                this.loadLevel(this.currentLevelNumber,playerState);
+                this.loadLevelName();
                 break;
         }
     }
@@ -73,9 +84,15 @@ export class StageManager extends ECS.Component {
         return levels;
     }
 
-    private loadLevel(levelNumber: number, playerState?: PlayerState) {
+    private loadLevelName() {
+        //print level name, after player pushed space, this component send message RUN_LEVEL and this.runLevel() is called
+        const levelName = this.levels[this.currentLevelNumber].name
+        this.scene.addGlobalComponent(new ScreenLevelName(levelName));
+    }
+
+    private runLevel() {
         const mapLoader = new MapLoader();
-        mapLoader.loadLevel(this.levels[levelNumber], this.scene, playerState);
+        mapLoader.loadLevel(this.levels[this.currentLevelNumber], this.scene, this.playerState);
         this.scene.stage.sortChildren();
     }
 }

@@ -30,10 +30,10 @@ export class MapLoader {
                 let blockType = level.tileTypesArr[y][x];
                 level.map[y][x] = null;
 
-                if(blockType === undefined){
-                    throw Error(`Some chars are missing in map (position [${x},${y}])`)    
+                if (blockType === undefined) {
+                    throw Error(`Some chars are missing in map (position [${x},${y}])`)
                 }
-                
+
                 if (blockType === BlockType.EMPTY) {
                     continue;
                 }
@@ -108,7 +108,7 @@ export class MapLoader {
                 sprite.addTag(Tags.KEY);
                 sprite.addTag(Tags.GREEN);
                 break;
-            
+
             case BlockType.EXIT_DOOR:
                 sprite.addTag(Tags.EXIT_DOOR);
                 break;
