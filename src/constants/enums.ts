@@ -33,7 +33,6 @@ export enum BlockType {
     INFO7 = 'INFO7',
     INFO8 = 'INFO8',
     INFO9 = 'INFO9',
-
 }
 
 export enum Direction {
@@ -55,9 +54,6 @@ export enum Layer {
     INFOBOX = "Infobox"
 }
 
-
-
-
 export enum Messages {
     RESTART_LEVEL = 'Restart level',
     LEVEL_DONE = 'Level done',
@@ -76,6 +72,7 @@ export enum Messages {
     PLAYER_DEAD = 'Player dead',
     KEY_TAKE = 'key take',
     KEY_USE = 'key use',
+    KEY_RESET = 'key reset',
 
     REMOVE_INFOBOX = 'remove infobox',
     RESET_INFOBOX = "RESET_INFOBOX",

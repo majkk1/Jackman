@@ -5,10 +5,6 @@ import { Attribute, Messages, Tags } from './constants/enums'
 import { PlayerKey } from './player-key';
 import { PlayerGun } from './player-gun';
 
-export interface hasKey {
-	hasBlueKey: boolean,
-	hasGreenKey: boolean
-}
 
 export interface PlayerState {
 	health: number,
@@ -16,8 +12,6 @@ export interface PlayerState {
 
 	hasGun: boolean,
 	ammo: number,
-
-	key: hasKey,
 }
 
 
@@ -28,10 +22,6 @@ export class PlayerStateUpdater extends ECS.Component {
 		coins: 0,
 		hasGun: false,
 		ammo: 0,
-		key: {
-			hasBlueKey: false,
-			hasGreenKey: false
-		}
 	};
 
 	onInit() {
@@ -51,6 +41,7 @@ export class PlayerStateUpdater extends ECS.Component {
 		//initialize statusbars
 		this.sendMessage(Messages.HEALTH_SET, this.state.health);
 		this.sendMessage(Messages.COIN_SET, this.state.coins);
+		this.sendMessage(Messages.KEY_RESET);
 		if(this.state.hasGun){
 			this.owner.addComponent(new PlayerGun());
 		}
@@ -98,17 +89,16 @@ export class PlayerStateUpdater extends ECS.Component {
 			case Messages.KEY_TAKE:
 				switch (msg.data) {
 					case Tags.BLUE:
-						this.state.key.hasBlueKey = true;
 						this.owner.addComponent(new PlayerKey(Tags.BLUE));
 						break;
 					case Tags.GREEN:
-						this.state.key.hasGreenKey = true;
 						this.owner.addComponent(new PlayerKey(Tags.GREEN));
 						break;
 				}
 				break;
 		}
 		this.owner.assignAttribute(Attribute.PLAYER_STATE, this.state);
+		console.log(this.state);
 	}
 
 }

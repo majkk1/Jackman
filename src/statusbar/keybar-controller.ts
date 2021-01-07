@@ -16,6 +16,7 @@ export class KeybarController extends ECS.Component {
     onInit() {
         this.subscribe(Messages.KEY_TAKE);
         this.subscribe(Messages.KEY_USE);
+        this.subscribe(Messages.KEY_RESET);
 
         //add first key
         this.addKey(this.firstColor);
@@ -30,7 +31,11 @@ export class KeybarController extends ECS.Component {
             case Messages.KEY_USE:
                 this.removeKey(msg.data);
                 break;
-         }
+
+            case Messages.KEY_RESET:
+                this.resetKey();
+                break;
+        }
     }
 
     private addKey(color: Tags) {
@@ -74,5 +79,13 @@ export class KeybarController extends ECS.Component {
             sprite.y = this.scene.height - 1;
             i++;
         }
+    }
+
+    private resetKey() {
+        this.keys.forEach(key => {
+            key.destroy();
+        });
+
+        this.keys = new Map();
     }
 }
