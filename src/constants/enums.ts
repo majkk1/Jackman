@@ -60,6 +60,7 @@ export enum Layer {
 
 
 export enum Messages {
+    NEW_GAME = "New game",
     RUN_LEVEL = "Run level",
     RESTART_LEVEL = 'Restart level',
     LEVEL_DONE = 'Level done',
