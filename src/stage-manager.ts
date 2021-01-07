@@ -7,6 +7,7 @@ import { StatusbarBuilder } from './statusbar/statusbar-builder';
 import { Attribute } from './constants/enums';
 import { PlayerState } from './player-state-updater';
 import { ScreenLevelName } from './screen-level-name';
+import { ScreenGameOver } from './screen-game-over';
 
 export class StageManager extends ECS.Component {
 
@@ -20,6 +21,7 @@ export class StageManager extends ECS.Component {
         this.subscribe(Messages.RUN_LEVEL);
         this.subscribe(Messages.PLAYER_DEAD);
         this.subscribe(Messages.LEVEL_DONE);
+        this.subscribe(Messages.GAME_RESET);
 
         //load level data from config file
         this.levels = this.loadLevelsFromFile();
@@ -35,16 +37,20 @@ export class StageManager extends ECS.Component {
     }
 
     onMessage(msg: ECS.Message) {
-        console.log('msg: ',msg)
         switch (msg.action) {
             case Messages.RUN_LEVEL:
                 this.runLevel();
                 break;
 
-
             case Messages.PLAYER_DEAD:
                 this.scene.findObjectByName(Layer.MAP_LAYER).destroy();
+                const coins = msg.data.coins;
+                this.scene.addGlobalComponent(new ScreenGameOver(coins));
                 this.playerState = null;
+                break;
+
+            case Messages.GAME_RESET:
+                this.currentLevelNumber = 0;
                 this.runLevel();
                 break;
 
@@ -67,10 +73,6 @@ export class StageManager extends ECS.Component {
     }
 
     private initGameStage() {
-        this.loadStatusbar();
-    }
-
-    private loadStatusbar() {
         new StatusbarBuilder().build(this.scene);
     }
 

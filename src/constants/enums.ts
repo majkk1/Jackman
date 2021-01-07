@@ -57,10 +57,13 @@ export enum Layer {
 }
 
 
+
+
 export enum Messages {
     RUN_LEVEL = "Run level",
     RESTART_LEVEL = 'Restart level',
     LEVEL_DONE = 'Level done',
+    GAME_RESET = "Game reset",
 
     HEALTH_ADD = 'Health add',
     HEALTH_REMOVE = 'Health remove',

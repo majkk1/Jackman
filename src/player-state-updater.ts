@@ -31,10 +31,10 @@ export class PlayerStateUpdater extends ECS.Component {
 		this.subscribe(Messages.GUN_TAKE);
 		this.subscribe(Messages.GUN_FIRE);
 		this.subscribe(Messages.KEY_TAKE);
-		
+
 		//if player is saved, load it
 		const savedPlayerState = this.owner.getAttribute(Attribute.PLAYER_STATE) as PlayerState;
-		if (savedPlayerState){
+		if (savedPlayerState) {
 			this.state = savedPlayerState;
 		}
 
@@ -42,7 +42,7 @@ export class PlayerStateUpdater extends ECS.Component {
 		this.sendMessage(Messages.HEALTH_SET, this.state.health);
 		this.sendMessage(Messages.COIN_SET, this.state.coins);
 		this.sendMessage(Messages.KEY_RESET);
-		if(this.state.hasGun){
+		if (this.state.hasGun) {
 			this.owner.addComponent(new PlayerGun());
 		}
 	}
@@ -55,15 +55,15 @@ export class PlayerStateUpdater extends ECS.Component {
 		switch (msg.action) {
 			case Messages.HEALTH_ADD:
 				this.state.health++;
-				this.sendMessage(Messages.HEALTH_SET,this.state.health);
+				this.sendMessage(Messages.HEALTH_SET, this.state.health);
 				break;
 
 			case Messages.HEALTH_REMOVE:
 				this.state.health--;
-				this.sendMessage(Messages.HEALTH_SET,this.state.health);
+				this.sendMessage(Messages.HEALTH_SET, this.state.health);
 				this.owner.addComponent(new BlinkingSprite(PLAYER_IMMORTALITY_TIME)); //blinking animation
 				if (this.state.health == 0) {
-					this.sendMessage(Messages.PLAYER_DEAD);
+					this.sendMessage(Messages.PLAYER_DEAD, this.state);
 					return;
 				}
 				break;
