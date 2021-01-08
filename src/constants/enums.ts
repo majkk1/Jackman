@@ -56,7 +56,7 @@ export enum Layer {
     AMMOBAR = 'Ammobar',
     ITEMBAR = 'Itembar',
     INFOBOX = "Infobox",
-    LEVEL_NAME = "Level Name Layer"
+    MENU_SCREEN = "MenuScreen"
 }
 
 

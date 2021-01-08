@@ -17,7 +17,7 @@ export class ScreenWelcome extends ECS.Component {
     onInit() {
         this.keyInputCmp = this.scene.findGlobalComponentByName<ECS.KeyInputComponent>(ECS.KeyInputComponent.name);
 
-        this.levelNameLayer = new ECS.Container(Layer.LEVEL_NAME);
+        this.levelNameLayer = new ECS.Container(Layer.MENU_SCREEN);
         this.owner.addChild(this.levelNameLayer);
         this.createScreen();
     }
