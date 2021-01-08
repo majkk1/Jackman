@@ -104,7 +104,6 @@ export class StageManager extends ECS.Component {
         this.scene.findObjectByName(Layer.MAP_LAYER).destroy();
 
         //if player win last level
-        console.log(this.levels.length);
         if (this.currentLevelNumber == this.levels.length) {
             this.scene.addGlobalComponent(new ScreenWinGame(this.playerState.coins));
         }
@@ -112,7 +111,6 @@ export class StageManager extends ECS.Component {
             this.loadLevelNameScreen();
         }
     }
-
 
     private initGameStage() {
         new StatusbarBuilder().build(this.scene);

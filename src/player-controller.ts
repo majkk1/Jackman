@@ -1,6 +1,6 @@
 import * as ECS from '../libs/pixi-ecs';
 import { DELTA_MUL, GRAVITY, JUMP_TRESHOLD, PLAYER_JUMP_SIZE, PLAYER_WALK_SPEED } from './constants/constants'
-import { Attribute, Direction, GlobalAttribute, PlayerMoveState } from './constants/enums'
+import { Attribute, Direction, GlobalAttribute, Messages, PlayerMoveState } from './constants/enums'
 import { Vector2 } from './utils/vector2';
 import { Level } from './level';
 
@@ -14,8 +14,23 @@ export class PlayerController extends ECS.Component {
 	speed: Vector2 = new Vector2(0, 0);
 	direction: Direction;
 
-	hasGun: boolean = true; //TODO
+	//for double jump powerup
+	doubleJumpEnabled: boolean = false;
+	secondJumpPossible: boolean = false;
+	jumpInRow: number = 0;
 
+	onInit() {
+		this.subscribe(Messages.DOUBLE_JUMP_ENABLED);
+	}
+
+	//if poweup affecting physics is taken, apply it
+	onMessage(msg: ECS.Message) {
+		switch (msg.action) {
+			case Messages.DOUBLE_JUMP_ENABLED:
+				this.doubleJumpEnabled = true;
+				break;
+		}
+	}
 
 	onUpdate(delta: number, absolute: number) {
 		this.direction = this.owner.getAttribute(Attribute.DIRECTION)
@@ -96,27 +111,32 @@ export class PlayerController extends ECS.Component {
 					}
 
 					// first stage of jump - add speed, remove gravity
-					if (this.isOnGround && !this.inJump) {
+					if ((this.isOnGround && !this.inJump) || (this.doubleJumpEnabled && this.secondJumpPossible)) {
 						this.inJump = true;
 						this.oldY = this.owner.y;
 						this.speed.y = -PLAYER_JUMP_SIZE;
 						this.isOnGround = false;
+						this.secondJumpPossible = false;
+						this.jumpInRow++;
 					}
 					// end of jump (timeout)
 					else if (!this.inJump || this.jumpLen > JUMP_TRESHOLD) {
 						this.inJump = false; // gravity is back
 						keyInputCmp.handleKey(ECS.Keys.KEY_SPACE);
 						this.jumpLen = 0;
+						if (this.secondJumpPossible === false && this.jumpInRow < 2) this.secondJumpPossible = true;
 					}
 				}
 				// end of jump
 				else {
 					this.jumpLen = 0;
 					this.inJump = false;
+					if (this.secondJumpPossible === false && this.jumpInRow < 2) this.secondJumpPossible = true;
 				}
 
 				//no jump && on the ground 
 				if (this.isOnGround && this.inJump == false) {
+					this.jumpInRow = 0;
 					this.playerMoveState = PlayerMoveState.STAND;
 				}
 				break;

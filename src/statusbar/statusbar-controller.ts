@@ -3,13 +3,13 @@ import { Layer, Messages } from '../constants/enums'
 import { HealthbarController } from './healthbar-controller'
 import { CoinbarController } from './coinbar-controller'
 import { AmmobarController } from './ammobar-controller'
-import { KeybarController } from './keybar-controller'
+import { ItembarController } from './itembar-controller'
 
 export class StatusbarController extends ECS.Component {
     healthbar: ECS.Container;
     coinbar: ECS.Container;
+    itembar: ECS.Container;
     ammobar: ECS.Container = null;
-    keybar: ECS.Container = null;
 
     onInit() {
         this.healthbar = new ECS.Container(Layer.HEALTHBAR);
@@ -20,9 +20,12 @@ export class StatusbarController extends ECS.Component {
         this.coinbar.addComponent(new CoinbarController());
         this.owner.addChild(this.coinbar);
 
+        this.itembar = new ECS.Container(Layer.ITEMBAR);
+        this.itembar.addComponent(new ItembarController());
+        this.owner.addChild(this.itembar);
+
         this.subscribe(Messages.GUN_TAKE);
         this.subscribe(Messages.PLAYER_DEAD);
-        this.subscribe(Messages.KEY_TAKE);
     }
 
     onMessage(msg: ECS.Message) {
@@ -40,17 +43,9 @@ export class StatusbarController extends ECS.Component {
                     this.ammobar.destroy();
                     this.ammobar = null;
                 }
-                if (this.keybar !== null) {
-                    this.keybar.destroy();
-                    this.keybar = null;
-                }
-                break;
-
-            case Messages.KEY_TAKE:
-                if (this.keybar === null) {
-                    this.keybar = new ECS.Container(Layer.KEYBAR);
-                    this.keybar.addComponent(new KeybarController(msg.data));
-                    this.owner.addChild(this.keybar);
+                if (this.itembar !== null) {
+                    this.itembar.destroy();
+                    this.itembar = null;
                 }
                 break;
         }

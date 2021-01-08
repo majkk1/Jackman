@@ -17,6 +17,7 @@ export enum BlockType {
     MONSTER = 'MONSTER',
     HEALTH_COIN = 'HEALTH_COIN',
     COIN = 'COIN',
+    DOUBLE_JUMP = 'DOUBLE_JUMP',
     GUN = 'GUN',
     BLUE_GATE = 'BLUE_GATE',
     GREEN_GATE = 'GREEN_GATE',
@@ -52,13 +53,10 @@ export enum Layer {
     HEALTHBAR = 'Healthbar',
     COINBAR = 'Coinbar',
     AMMOBAR = 'Ammobar',
-    KEYBAR = 'Keybar',
+    ITEMBAR = 'Itembar',
     INFOBOX = "Infobox",
     LEVEL_NAME = "Level Name Layer"
 }
-
-
-
 
 export enum Messages {
     NEW_GAME = "New game",
@@ -81,10 +79,13 @@ export enum Messages {
     PLAYER_DEAD = 'Player dead',
     KEY_TAKE = 'key take',
     KEY_USE = 'key use',
-    KEY_RESET = 'key reset',
+
+    ITEMBAR_RESET = 'itembar reset',
+    ITEM_ADD = 'item add',
 
     REMOVE_INFOBOX = 'remove infobox',
     RESET_INFOBOX = "RESET_INFOBOX",
+    DOUBLE_JUMP_ENABLED = "DOUBLE_JUMP_ENABLED"
 }
 
 export enum PlayerMoveState {
@@ -101,6 +102,7 @@ export enum Tags {
     POWERUP = 'powerup',
     HEALTH_COIN = 'health coin',
     COIN = 'coin',
+    DOUBLE_JUMP = 'double jump',
     GUN = 'gun',
     KEY = 'key',
     GATE = 'gate',

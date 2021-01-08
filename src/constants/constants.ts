@@ -14,6 +14,7 @@ export const decodeLevelChar = {
     'M': BlockType.MONSTER,
     'h': BlockType.HEALTH_COIN,
     'c': BlockType.COIN,
+    'd': BlockType.DOUBLE_JUMP,
     'g': BlockType.GUN,
     'Z': BlockType.BLUE_GATE,
     'z': BlockType.BLUE_KEY,

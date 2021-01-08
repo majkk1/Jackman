@@ -90,6 +90,11 @@ export class MapLoader {
                 sprite.addTag(Tags.COIN);
                 break;
 
+            case BlockType.DOUBLE_JUMP:
+                sprite.addTag(Tags.POWERUP);
+                sprite.addTag(Tags.DOUBLE_JUMP);
+                break;
+
             case BlockType.GUN:
                 sprite.addTag(Tags.POWERUP);
                 sprite.addTag(Tags.GUN);

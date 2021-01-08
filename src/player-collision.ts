@@ -27,13 +27,12 @@ export class PlayerCollision extends ECS.Component {
         this.checkCollisionExitdoor();
     }
 
-    private checkCollisionExitdoor(){
+    private checkCollisionExitdoor() {
         const exit = this.scene.findObjectsByTag(Tags.EXIT_DOOR);
-        const collider = this.collideWith(exit); 
+        const collider = this.collideWith(exit);
 
-        if(collider){
+        if (collider) {
             this.sendMessage(Messages.LEVEL_DONE);
-            console.log('level done');
             collider.removeTag(Tags.EXIT_DOOR); //sent message only once
         }
     }
@@ -84,6 +83,10 @@ export class PlayerCollision extends ECS.Component {
             }
             else if (collider.hasTag(Tags.COIN)) {
                 this.sendMessage(Messages.COIN_ADD);
+                collider.destroy();
+            }
+            else if (collider.hasTag(Tags.DOUBLE_JUMP)) {
+                this.sendMessage(Messages.DOUBLE_JUMP_ENABLED);
                 collider.destroy();
             }
             else if (collider.hasTag(Tags.GUN)) {
