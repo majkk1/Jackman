@@ -9,6 +9,7 @@ import { PlayerState } from './player-state-updater';
 import { ScreenWelcome } from './screen-welcome';
 import { ScreenLevelName } from './screen-level-name';
 import { ScreenGameOver } from './screen-game-over';
+import { ScreenWinGame } from './screen-win-game';
 
 export class StageManager extends ECS.Component {
 
@@ -64,6 +65,7 @@ export class StageManager extends ECS.Component {
         if (statusBar) {
             statusBar.destroy();
         }
+        this.playerState = null;
 
         this.scene.addGlobalComponent(new ScreenWelcome());
     }
@@ -98,14 +100,17 @@ export class StageManager extends ECS.Component {
         const player = this.scene.findObjectByTag(Tags.PLAYER);
         this.playerState = player.getAttribute(Attribute.PLAYER_STATE) as PlayerState;
 
-        //if player win last level
-        if (this.currentLevelNumber == this.levels.length) {
-            //todo show end screen
-            this.currentLevelNumber = 0;
-        }
-
+        //cleanup
         this.scene.findObjectByName(Layer.MAP_LAYER).destroy();
-        this.loadLevelNameScreen();
+
+        //if player win last level
+        console.log(this.levels.length);
+        if (this.currentLevelNumber == this.levels.length) {
+            this.scene.addGlobalComponent(new ScreenWinGame(this.playerState.coins));
+        }
+        else {
+            this.loadLevelNameScreen();
+        }
     }
 
 
