@@ -21,10 +21,10 @@ export class InfoboxController extends ECS.Component {
 
         this.text = new ECS.BitmapText('infobox bitmaptext', this.infoSprite.name, Assets.FONT, 0.5, 0xFFFFFF);
         this.text.scale.set(ASSET_RES);
-        this.text.anchor = 0.5;
-        this.text.zIndex = 10;
         this.text.x = this.infoSprite.x;
-        this.text.y = this.infoSprite.y - ASSET_RES * this.infoSprite.height;
+        this.text.y = this.infoSprite.y - ASSET_RES;
+        this.text.anchor = 0.5;
+        this.text.zIndex = 20;
 
         this.owner.addChild(this.text);
     }

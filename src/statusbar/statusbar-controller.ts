@@ -43,10 +43,6 @@ export class StatusbarController extends ECS.Component {
                     this.ammobar.destroy();
                     this.ammobar = null;
                 }
-                if (this.itembar !== null) {
-                    this.itembar.destroy();
-                    this.itembar = null;
-                }
                 break;
         }
     }

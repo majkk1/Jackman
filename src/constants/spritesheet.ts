@@ -12,7 +12,7 @@ export const SpritesheetInfo = {
     "GREEN_KEY" :      { x: 64,  y: 80, width: 32, height: 16 },
     "BLUE_KEY_ICON" :  { x: 96,  y: 64, width: 32, height: 32 },
     "GREEN_KEY_ICON" : { x: 128, y: 64, width: 32, height: 32 },
-    "INFO" :           { x: 132, y: 36, width: 24, height: 24 },
+    "INFO" :           { x: 128, y: 32, width: 32, height: 32 },
     "PLAYER" :         { x: 0,   y: 32, width: 32, height: 32 },
     "MONSTER" :        { x: 32,  y: 32, width: 32, height: 32 },
     "EXIT_DOOR" :      { x: 160, y: 32, width: 32, height: 32 },
