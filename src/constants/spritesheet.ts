@@ -1,6 +1,6 @@
 
 export const SpritesheetInfo = {
-    "WALL" :        { x: 0,   y: 0,  width: 32, height: 32 },
+    "WALL" :        { x: 32,   y: 0,  width: 32, height: 32 },
     "HEALTH_COIN" : { x: 128, y: 0,  width: 32, height: 32 },
     "COIN" :        { x: 160, y: 0,  width: 32, height: 32 },
     "GUN" :         { x: 192, y: 0,  width: 32, height: 32 },

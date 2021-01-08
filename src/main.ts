@@ -19,13 +19,18 @@ class MyGame {
 			width: canvas.width,
 			height: canvas.height,
 			resolution: canvas.width / SCENE_WIDTH,
-			resizeToScreen: true
+			resizeToScreen: true,
+			backgroundColor: 0x0a0a0a,
+			antialias: false,
 		});
+
+		PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
 		this.engine.app.loader
 			.reset()
 			.add(Assets.SPRITESHEET, './assets/spritesheet.png')
 			.add(Assets.LEVELS, './assets/levels.txt')
+			.add(Assets.LEVEL_BACKGROUND, './assets/level_background.png')
 			.add(Assets.FONT, './assets/font/font.fnt')
 			.load(() => this.loadGame());
 	}

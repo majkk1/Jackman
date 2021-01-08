@@ -12,12 +12,20 @@ import { SpritesheetInfo } from './constants/spritesheet';
 
 export class MapLoader {
 
+    readonly scene;
+
+    constructor(scene: ECS.Scene) {
+        this.scene = scene;
+    }
+
     loadLevel(level: Level, scene: ECS.Scene, playerState?: PlayerState) {
         scene.assignGlobalAttribute(GlobalAttribute.LEVEL, level);
 
         //create map
         let mapLayer = new ECS.Container(Layer.MAP_LAYER);
         scene.stage.addChild(mapLayer);
+
+        this.buildBackground(mapLayer, level);
 
         let playerX: number;
         let playerY: number;
@@ -182,5 +190,16 @@ export class MapLoader {
         texture.frame = new PIXI.Rectangle(offsetX, offsetY, width, height);
 
         return texture;
+    }
+
+    private buildBackground(mapLayer: ECS.Container, level: Level) {
+        let texture = PIXI.Texture.from(Assets.LEVEL_BACKGROUND).clone();
+        texture.frame = new PIXI.Rectangle(0, 0, 1600, 1200);
+        let background = new ECS.Sprite('background', texture);
+
+        background.scale.set(TEXTURE_SCALE);
+        background.width = level.width;
+        background.height = level.height;
+        mapLayer.addChild(background);
     }
 }

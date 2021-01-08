@@ -1,6 +1,7 @@
 export enum Assets {
     SPRITESHEET = 'spritesheet',
     LEVELS = 'levels',
+    LEVEL_BACKGROUND = 'level background',
     FONT = 'Early GameBoy'
 }
 

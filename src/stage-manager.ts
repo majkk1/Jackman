@@ -81,7 +81,7 @@ export class StageManager extends ECS.Component {
     }
 
     private runLevel() {
-        const mapLoader = new MapLoader();
+        const mapLoader = new MapLoader(this.scene);
         mapLoader.loadLevel(this.levels[this.currentLevelNumber], this.scene, this.playerState);
         this.scene.stage.sortChildren();
     }
