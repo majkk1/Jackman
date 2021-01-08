@@ -1,6 +1,9 @@
 import * as ECS from '../../libs/pixi-ecs';
 import { Assets, Messages } from '../constants/enums'
 
+/**
+ * This component shows information about ammo in left bottom corner
+ */
 export class AmmobarController extends ECS.Component {
 
     ammo: number = 0;
@@ -20,7 +23,9 @@ export class AmmobarController extends ECS.Component {
     }
 
     private updateBar() {
-        if (this.text !== null) this.text.destroy();
+        if (this.text !== null) {
+            this.text.destroy();
+        }
         this.text = new ECS.BitmapText('ammobar', 'ammo:' + this.ammo, Assets.FONT, 1, 0xFFFF00);
         this.text.position.set(0.25, this.scene.height - 2);
         this.owner.addChild(this.text);

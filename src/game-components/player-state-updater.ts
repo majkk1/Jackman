@@ -1,7 +1,7 @@
-import * as ECS from '../libs/pixi-ecs';
+import * as ECS from '../../libs/pixi-ecs';
 import { BlinkingSprite } from './blinking-sprite';
-import { GUN_AMMO_CAPACITY, INIT_HEALTH, PLAYER_IMMORTALITY_TIME } from './constants/constants'
-import { Attribute, Messages, Tags } from './constants/enums'
+import { GUN_AMMO_CAPACITY, INIT_HEALTH, PLAYER_IMMORTALITY_TIME } from '../constants/constants'
+import { Attribute, Messages, Tags } from '../constants/enums'
 import { PlayerKey } from './player-key';
 import { PlayerGun } from './player-gun';
 
@@ -14,7 +14,9 @@ export interface PlayerState {
 	ammo: number,
 }
 
-
+/**
+ * This component takes care of health, coins, ammo, items and so on. It also sends messages to statusbars.
+ */
 export class PlayerStateUpdater extends ECS.Component {
 
 	state: PlayerState = {
@@ -41,7 +43,6 @@ export class PlayerStateUpdater extends ECS.Component {
 		//initialize statusbars
 		this.sendMessage(Messages.HEALTH_SET, this.state.health);
 		this.sendMessage(Messages.COIN_SET, this.state.coins);
-		this.sendMessage(Messages.KEY_RESET);
 		if (this.state.hasGun) {
 			this.owner.addComponent(new PlayerGun());
 		}

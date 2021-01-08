@@ -1,20 +1,27 @@
-import * as ECS from '../libs/pixi-ecs';
-import { DELTA_MUL, GRAVITY, JUMP_TRESHOLD, PLAYER_JUMP_SIZE, PLAYER_WALK_SPEED } from './constants/constants'
-import { Attribute, Direction, GlobalAttribute, Messages, PlayerMoveState } from './constants/enums'
-import { Vector2 } from './utils/vector2';
-import { Level } from './level';
+import * as ECS from '../../libs/pixi-ecs';
+import { DELTA_MUL, GRAVITY, JUMP_TRESHOLD, PLAYER_JUMP_SIZE, PLAYER_WALK_SPEED } from '../constants/constants'
+import { Attribute, Direction, GlobalAttribute, Messages, PlayerMoveState } from '../constants/enums'
+import { Vector2 } from '../utils/vector2';
+import { Level } from '../level';
 
+/**
+ * This components solves user input and basic physics engine - collision with walls, gravity (NOT with powerups, monsters),
+ */
 export class PlayerController extends ECS.Component {
 
 	playerMoveState: PlayerMoveState = PlayerMoveState.STAND;
-	isOnGround: boolean = false;
-	oldY: number;
-	jumpLen: number = 0;
-	inJump: boolean = false;
 	speed: Vector2 = new Vector2(0, 0);
-	direction: Direction;
+	direction: Direction; //left or right
+	
+	isOnGround: boolean = false; //is player standing on gound (for jump, gravity, ...)
+	
+	//jump solving
+	oldY: number; //for measuring high of the jump
+	jumpLen: number = 0; //jump high
+	inJump: boolean = false; //if player started jump
 
-	playerJumpSize: number = PLAYER_JUMP_SIZE;
+	//these can be change by powerups
+	playerJumpSize: number = PLAYER_JUMP_SIZE; 
 	gravity: number = GRAVITY;
 
 	//double jump powerup
@@ -24,7 +31,6 @@ export class PlayerController extends ECS.Component {
 
 	//fly powerup
 	flyEnabled: boolean = false;
-
 
 	onInit() {
 		this.subscribe(Messages.DOUBLE_JUMP_ENABLED);
@@ -51,7 +57,7 @@ export class PlayerController extends ECS.Component {
 		this.direction = this.owner.getAttribute(Attribute.DIRECTION)
 		let deltaMul = delta * DELTA_MUL;
 
-		//update player state, add movement 
+		//update player state, add movement/speed
 		this.updatePlayerMoveState(deltaMul, absolute);
 
 		//add gravity (if not on ground or not going up)
@@ -61,12 +67,13 @@ export class PlayerController extends ECS.Component {
 			this.speed.y = Math.min(this.speed.y, this.gravity);
 		}
 
-		//apply physics on player
+		//apply physics/movement/speed on player
 		this.applyMovement();
 		this.owner.assignAttribute(Attribute.DIRECTION, this.direction)
 	}
 
-	updatePlayerMoveState(delta: number, absolute: number) {
+	//This reacts on keyboard inpput - it changes move state (WALK/STAND/JUMP)
+	private updatePlayerMoveState(delta: number, absolute: number) {
 		const keyInputCmp = this.scene.findGlobalComponentByName<ECS.KeyInputComponent>(ECS.KeyInputComponent.name);
 
 		switch (this.playerMoveState) {
@@ -149,7 +156,7 @@ export class PlayerController extends ECS.Component {
 					if (this.secondJumpPossible === false && this.jumpInRow < 2) this.secondJumpPossible = true;
 				}
 
-				//no jump && on the ground 
+				//no jump && on the ground -> STAND
 				if (this.isOnGround && this.inJump == false) {
 					this.jumpInRow = 0;
 					this.playerMoveState = PlayerMoveState.STAND;
@@ -158,7 +165,8 @@ export class PlayerController extends ECS.Component {
 		}
 	}
 
-	applyMovement() {
+	//this apply movement/speed to player coord and solve collisions with ground
+	private applyMovement() {
 		let platformMap = this.scene.getGlobalAttribute<Level>(GlobalAttribute.LEVEL).map;
 
 		//if no movement, return

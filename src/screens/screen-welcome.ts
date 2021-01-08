@@ -1,6 +1,9 @@
-import * as ECS from '../libs/pixi-ecs';
-import { Assets, Layer, Messages } from './constants/enums';
+import * as ECS from '../../libs/pixi-ecs';
+import { Assets, Layer, Messages } from '../constants/enums';
 
+/**
+ * Initial (welcome) screen with game logo
+ */
 export class ScreenWelcome extends ECS.Component {
 
     readonly levelName: string;

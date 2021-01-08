@@ -1,7 +1,10 @@
-import * as ECS from '../libs/pixi-ecs';
-import { Attribute, Direction, Messages, GlobalAttribute, Tags } from './constants/enums'
-import { Level } from './level';
+import * as ECS from '../../libs/pixi-ecs';
+import { Attribute, Direction, Messages, GlobalAttribute, Tags } from '../constants/enums'
+import { Level } from '../level';
 
+/**
+ * This component is assigned to player, when he pick up key. It controlls, if the locked door can be open.
+ */
 export class PlayerKey extends ECS.Component {
     
     readonly color: Tags;
@@ -18,7 +21,7 @@ export class PlayerKey extends ECS.Component {
     }
 
     onUpdate() {
-        //if shift is pushed -> TRY OPEN DOOR
+        //if shift is pushed -> TRY TO OPEN DOOR
         if (this.keyInputCmp.isKeyPressed(ECS.Keys.KEY_SHIFT)) {
             const direction = this.owner.getAttribute(Attribute.DIRECTION) as Direction;
 
@@ -26,20 +29,20 @@ export class PlayerKey extends ECS.Component {
                 let x = Math.floor(this.owner.x) - 1;
                 let y = this.owner.y;
 
-                this.checkForDoorTryOpen(x, Math.floor(y));
-                this.checkForDoorTryOpen(x, Math.ceil(y));
+                this.checkForDoorTryToOpen(x, Math.floor(y));
+                this.checkForDoorTryToOpen(x, Math.ceil(y));
             }
             else if (direction == Direction.RIGHT) {
                 let x = Math.ceil(this.owner.x) + 1;
                 let y = this.owner.y;
 
-                this.checkForDoorTryOpen(x, Math.floor(y));
-                this.checkForDoorTryOpen(x, Math.floor(y));
+                this.checkForDoorTryToOpen(x, Math.floor(y));
+                this.checkForDoorTryToOpen(x, Math.floor(y));
             }
         }
     }
 
-    private checkForDoorTryOpen(x: number, y: number) {
+    private checkForDoorTryToOpen(x: number, y: number) {
         let map = this.scene.getGlobalAttribute<Level>(GlobalAttribute.LEVEL).map;
         let tile = map[y][x];
 

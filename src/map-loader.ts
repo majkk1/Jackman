@@ -1,15 +1,18 @@
 import * as ECS from '../libs/pixi-ecs';
 import { Level } from './level'
-import { decodeLevelChar, TEXTURE_SCALE } from './constants/constants'
+import { TEXTURE_SCALE } from './constants/constants'
 import { Tags, BlockType, GlobalAttribute, Assets, Direction, Attribute, Layer } from './constants/enums'
-import { PlayerController } from './player-controller'
-import { PlayerCollision } from './player-collision'
-import { PlayerState, PlayerStateUpdater } from './player-state-updater'
-import { MonsterController } from './monster-controller'
-import { Camera } from './camera'
-import { TextureChanger } from './texture-changer';
+import { PlayerController } from './game-components/player-controller'
+import { PlayerCollision } from './game-components/player-collision'
+import { PlayerState, PlayerStateUpdater } from './game-components/player-state-updater'
+import { MonsterController } from './game-components/monster-controller'
+import { Camera } from './game-components/camera'
+import { TextureChanger } from './game-components/texture-changer';
 import { SpritesheetInfo } from './constants/spritesheet';
 
+/**
+ * This is helper class to create map layer from Level class
+ */
 export class MapLoader {
 
     readonly scene;
@@ -21,10 +24,11 @@ export class MapLoader {
     loadLevel(level: Level, scene: ECS.Scene, playerState?: PlayerState) {
         scene.assignGlobalAttribute(GlobalAttribute.LEVEL, level);
 
-        //create map
+        //create map layer
         let mapLayer = new ECS.Container(Layer.MAP_LAYER);
         scene.stage.addChild(mapLayer);
 
+        //add background
         this.buildBackground(mapLayer, level);
 
         let playerX: number;
@@ -32,6 +36,7 @@ export class MapLoader {
 
         level.map = [];
 
+        //load tiles
         for (let y = 0; y < level.height; y++) {
             level.map.push([]);
             for (let x = 0; x < level.width; x++) {
@@ -71,6 +76,7 @@ export class MapLoader {
             throw Error(`Player not found on map ${level.name}`);
         }
 
+        //build player - this starts the game
         this.buildPlayer(playerX, playerY, scene, playerState);
     }
 
@@ -134,6 +140,7 @@ export class MapLoader {
     }
 
     private buildSprite(x: number, y: number, level: Level, blockType: BlockType, mapLayer: ECS.Container) {
+        //build tile (which is not so special)
         const textureInfo = SpritesheetInfo[blockType];
 
         let sprite = new ECS.Sprite(blockType + ` [${x},${y}]`, this.createTexture(textureInfo.x, textureInfo.y, textureInfo.width, textureInfo.height));
@@ -149,6 +156,7 @@ export class MapLoader {
     }
 
     private buildInfo(x: number, y: number, level: Level, blockType: BlockType, mapLayer: ECS.Container) {
+        //build info tile
         let textureInfo = SpritesheetInfo[BlockType.INFO];
         let sprite = new ECS.Sprite(level.infoTexts[blockType.substring(4, 5)], this.createTexture(textureInfo.x, textureInfo.y, textureInfo.width, textureInfo.height));
 
@@ -161,7 +169,7 @@ export class MapLoader {
 
     private buildPlayer(x: number, y: number, scene: ECS.Scene, playerState?: PlayerState) {
         let textureInfo = SpritesheetInfo[BlockType.PLAYER];
-        let player = new ECS.Builder(scene)
+        new ECS.Builder(scene)
             .anchor(0, 0)
             .localPos(x, y)
             .withName(BlockType.PLAYER)

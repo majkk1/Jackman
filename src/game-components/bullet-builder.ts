@@ -1,8 +1,11 @@
-import * as ECS from '../libs/pixi-ecs';
-import { TEXTURE_SCALE } from './constants/constants'
-import { Assets, Direction, Tags } from './constants/enums'
+import * as ECS from '../../libs/pixi-ecs';
+import { TEXTURE_SCALE } from '../constants/constants'
+import { Assets, Direction, Tags } from '../constants/enums'
 import { BulletController } from './bullet-controller';
 
+/**
+ *  Helper class to build Bullet object.
+ */
 export class BulletBuilder {
     direction: Direction;
     player: ECS.Container;

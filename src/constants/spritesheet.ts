@@ -1,6 +1,7 @@
-
+//location of items in /assets/spritesheet.png
 export const SpritesheetInfo = {
     "WALL" :           { x: 32,  y: 0,  width: 32, height: 32 },
+    "HEARTH" :         { x: 96,  y: 0,  width: 32, height: 32 },
     "HEALTH_COIN" :    { x: 128, y: 0,  width: 32, height: 32 },
     "COIN" :           { x: 160, y: 0,  width: 32, height: 32 },
     "FLY" :            { x: 64 , y: 32, width: 32, height: 32 },

@@ -1,9 +1,12 @@
-import * as ECS from '../libs/pixi-ecs';
-import { DELTA_MUL } from './constants/constants'
-import { Direction, Attribute, GlobalAttribute, BlockType, Tags } from './constants/enums'
-import { Level } from './level';
-import { MONSTER_WALK_SPEED } from './constants/constants'
+import * as ECS from '../../libs/pixi-ecs';
+import { DELTA_MUL } from '../constants/constants'
+import { Direction, Attribute, GlobalAttribute } from '../constants/enums'
+import { Level } from '../level';
+import { MONSTER_WALK_SPEED } from '../constants/constants'
 
+/**
+ * This component controlls movement of monster object.
+ */
 export class MonsterController extends ECS.Component {
 
     direction: Direction;

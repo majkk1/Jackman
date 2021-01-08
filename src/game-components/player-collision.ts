@@ -1,10 +1,14 @@
-import * as ECS from '../libs/pixi-ecs';
-import { HEALTH_LIMIT, INFOBOX_TIMER, PLAYER_IMMORTALITY_TIME } from './constants/constants';
-import { Attribute, Messages, Tags } from './constants/enums'
+import * as ECS from '../../libs/pixi-ecs';
+import { HEALTH_LIMIT, PLAYER_IMMORTALITY_TIME } from '../constants/constants';
+import { Attribute, Messages, Tags } from '../constants/enums'
 import { PlayerState } from './player-state-updater';
 import { InfoboxController } from './infobox-controller';
 
+/**
+ * This component solves player collision with monsters/powerups/keys/infoboxes/exit door.
+ */
 export class PlayerCollision extends ECS.Component {
+    
     playerBox: PIXI.Rectangle;
     lastCollisionMonster: number = 0;
     isOnInfobox: boolean = false;
@@ -23,7 +27,7 @@ export class PlayerCollision extends ECS.Component {
         //check for collision with infobox
         this.checkCollisionInfobox();
 
-        //check for collision with infobox
+        //check for collision with exit
         this.checkCollisionExitdoor();
     }
 
@@ -32,7 +36,7 @@ export class PlayerCollision extends ECS.Component {
         const collider = this.collideWith(exit);
 
         if (collider) {
-            this.sendMessage(Messages.LEVEL_DONE);
+            this.sendMessage(Messages.LEVEL_DONE); //load next level
             collider.removeTag(Tags.EXIT_DOOR); //sent message only once
         }
     }
@@ -42,6 +46,7 @@ export class PlayerCollision extends ECS.Component {
         const collider = this.collideWith(infoBox);
 
         if (collider !== null) {
+            //print message of this collider
             if (this.lastInfoboxColider !== collider) {
                 //if collision with new collider, find or create controller
                 let controller = collider.findComponentByName(InfoboxController.name);
@@ -50,8 +55,8 @@ export class PlayerCollision extends ECS.Component {
                     this.sendMessage(Messages.RESET_INFOBOX, controller.id);
                 }
                 else {
-                    //else create mew controller
-                    controller = new InfoboxController(collider.asSprite());
+                    //else create new controller
+                    controller = new InfoboxController();
                     collider.asSprite().addComponent(controller);
                 }
                 this.lastInfoboxController = controller;

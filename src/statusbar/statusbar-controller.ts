@@ -5,6 +5,9 @@ import { CoinbarController } from './coinbar-controller'
 import { AmmobarController } from './ammobar-controller'
 import { ItembarController } from './itembar-controller'
 
+/**
+ * This component holds information about different parts of statusbar - healthbar, coinbar etc.
+ */
 export class StatusbarController extends ECS.Component {
     healthbar: ECS.Container;
     coinbar: ECS.Container;

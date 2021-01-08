@@ -1,6 +1,9 @@
-import * as ECS from '../libs/pixi-ecs';
-import { Attribute, Direction } from './constants/enums';
+import * as ECS from '../../libs/pixi-ecs';
+import { Attribute, Direction } from '../constants/enums';
 
+/**
+ * This component is assigned to the player and monsters. It changes (flips) their textures when they change direction.
+ */
 export class TextureChanger extends ECS.Component {
 
     direction: Direction;

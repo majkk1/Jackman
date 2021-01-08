@@ -1,6 +1,9 @@
 import { decodeLevelChar } from './constants/constants'
 import { Level, LevelBuilder } from './level'
 
+/**
+ * Helper class to parse file with levels
+ */
 export class LevelParser {
     parse(data: string): Level[] {
 
@@ -11,6 +14,7 @@ export class LevelParser {
 
         lines.forEach(line => {
             if (line.startsWith(':')) {
+                //this is levelname
                 if (levelBuilder) {
                     levels.push(levelBuilder.build());
                 }
@@ -19,6 +23,7 @@ export class LevelParser {
                 return;
             }
             else if (line.match(/^\d\ /)) {
+                //this is line with text for info box
                 levelBuilder.infoTexts.push(line.substr(2));
                 return;
             }
@@ -26,10 +31,12 @@ export class LevelParser {
             let xPos = 0;
 
             for (let character of line) {
+                //it should be printable char
                 if (character.charCodeAt(0) < 32 || character.charCodeAt(0) > 126) {
                     continue;
                 }
-
+                
+                //decode char to blocktype and save it
                 let decodedCharacter = decodeLevelChar[character];
                 if (decodedCharacter !== undefined) {
                     levelBuilder.tileTypesArr[levelBuilder.sizeY].push(decodedCharacter);

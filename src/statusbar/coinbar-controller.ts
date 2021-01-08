@@ -1,7 +1,9 @@
 import * as ECS from '../../libs/pixi-ecs';
 import { Assets, Messages } from '../constants/enums'
-import { ASSET_RES, HEALTH_LIMIT, TEXTURE_SCALE } from '../constants/constants'
 
+/**
+ * This component shows information about collected coins in top left corner
+ */
 export class CoinbarController extends ECS.Component {
 
     coins: number = 0;
@@ -26,7 +28,9 @@ export class CoinbarController extends ECS.Component {
     }
 
     private updateBar() {
-        if (this.text !== null) this.text.destroy();
+        if (this.text !== null) {
+            this.text.destroy();
+        }
         this.text = new ECS.BitmapText('coinbar', '(' + this.coins, Assets.FONT, 1, 0xFFFF00);
         this.text.position.set(0.25, 0);
         this.owner.addChild(this.text);

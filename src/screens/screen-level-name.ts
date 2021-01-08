@@ -1,7 +1,9 @@
-import * as ECS from '../libs/pixi-ecs';
-import { Assets, Layer, Messages } from './constants/enums';
-import { Level } from './level';
+import * as ECS from '../../libs/pixi-ecs';
+import { Assets, Layer, Messages } from '../constants/enums';
 
+/**
+ * Screen with level name (before level starts)
+ */
 export class ScreenLevelName extends ECS.Component {
 
     readonly levelName: string;
@@ -45,10 +47,10 @@ export class ScreenLevelName extends ECS.Component {
         textLevel.position.set(this.scene.width / 2, this.scene.height / 2);
         this.levelNameLayer.addChild(textLevel);
 
-        //text - level name
+        //text - press space to continue
         let textSpace = new ECS.BitmapText('Text space', 'Press space', Assets.FONT, 0.8, 0xdadada);
         textSpace.anchor = 0.5;
-        textSpace.position.set(this.scene.width / 2, this.scene.height * 3 / 4);
+        textSpace.position.set(this.scene.width / 2, this.scene.height * 7 / 8);
         this.levelNameLayer.addChild(textSpace);
     }
 }

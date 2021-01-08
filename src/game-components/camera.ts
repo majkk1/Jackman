@@ -1,7 +1,10 @@
-import * as ECS from '../libs/pixi-ecs';
-import { CAMERA_X_BORDER, CAMERA_Y_BORDER } from './constants/constants';
-import { Layer } from './constants/enums';
+import * as ECS from '../../libs/pixi-ecs';
+import { CAMERA_X_BORDER, CAMERA_Y_BORDER } from '../constants/constants';
+import { Layer } from '../constants/enums';
 
+/**
+ * This class should be assigned to the player. If player (owner) is close to the screen edge, this component will move with the mapLayer object.
+ */
 export class Camera extends ECS.Component {
 
     screenHeight: number;

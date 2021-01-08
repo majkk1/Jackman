@@ -1,5 +1,8 @@
-import * as ECS from '../libs/pixi-ecs';
+import * as ECS from '../../libs/pixi-ecs';
 
+/**
+ * Component which makes owner blinking.
+ */
 export class BlinkingSprite extends ECS.Component {
 
     duration: number;

@@ -1,15 +1,15 @@
-import * as ECS from '../libs/pixi-ecs';
-import { DELTA_MUL } from './constants/constants';
-import { Tags, GlobalAttribute, Direction } from './constants/enums';
-import { Level } from './level';
+import * as ECS from '../../libs/pixi-ecs';
+import { BULLET_SPEED, DELTA_MUL } from '../constants/constants';
+import { Tags, GlobalAttribute, Direction } from '../constants/enums';
+import { Level } from '../level';
 
-
+/**
+ * Bullet controller. Moves bullet left or right and checks for collision
+ */
 export class BulletController extends ECS.Component {
 
     direction: Direction;
     level: Level;
-
-    readonly BULLET_SPEED = 3;
 
     constructor(direction: Direction) {
         super();
@@ -30,10 +30,10 @@ export class BulletController extends ECS.Component {
 
     private moveBullet(delta: number) {
         if (this.direction === Direction.LEFT) {
-            this.owner.x -= this.BULLET_SPEED * delta;
+            this.owner.x -= BULLET_SPEED * delta;
         }
         if (this.direction === Direction.RIGHT) {
-            this.owner.x += this.BULLET_SPEED * delta;
+            this.owner.x += BULLET_SPEED * delta;
         }
     }
 
@@ -46,8 +46,9 @@ export class BulletController extends ECS.Component {
     }
 
     private checkCollision() {
+        //bullet can't be out of the map
         if (this.owner.x < 0 || this.owner.x > this.level.width) {
-            this.owner.destroy(); //how to get map size?
+            this.owner.destroy();
             return;
         }
 
@@ -58,7 +59,7 @@ export class BulletController extends ECS.Component {
         let objects = [...ground, ...monsters];
 
         for (let colider of objects) {
-            const cBox = colider.getBounds(); //get ground cbox
+            const cBox = colider.getBounds(); //get cbox of possible collider
 
             //is there a intersection?
             let horizIntersection = this.horizIntersection(bulletBox, cBox);
@@ -66,12 +67,11 @@ export class BulletController extends ECS.Component {
             let collides = (horizIntersection > 0 && verIntersection > 0);
 
             if (collides) {
-                this.owner.destroy();
+                this.owner.destroy(); //destory bullet
 
                 if (colider.hasTag(Tags.MONSTER)) {
-                    colider.destroy();
+                    colider.destroy(); //destroy monster
                 }
-
                 return;
             }
         }

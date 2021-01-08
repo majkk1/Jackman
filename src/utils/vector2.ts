@@ -1,3 +1,4 @@
+//vector for speed (player-controller.ts)
 export class Vector2 {
     x: number;
     y: number;

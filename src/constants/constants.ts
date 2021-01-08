@@ -50,6 +50,9 @@ export const INIT_HEALTH = 3;
 //monster-controller.ts
 export const MONSTER_WALK_SPEED = 0.2;
 
+//bullet-controller.ts
+export const BULLET_SPEED = 3;
+
 //camera.ts
 export const CAMERA_X_BORDER = 9;
 export const CAMERA_Y_BORDER = 8;

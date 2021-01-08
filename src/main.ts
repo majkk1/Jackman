@@ -1,13 +1,9 @@
 import * as ECS from '../libs/pixi-ecs';
 import { SCENE_WIDTH } from './constants/constants'
 import { Assets } from './constants/enums'
-import { MapLoader } from './map-loader'
-import { LevelParser } from './level-parser'
 import { StageManager } from './stage-manager'
 
-
-// TODO rename your game
-class MyGame {
+class Jackman {
 	engine: ECS.Engine;
 
 	constructor() {
@@ -36,10 +32,11 @@ class MyGame {
 	}
 
 	loadGame() {
+		//add and run main component
 		this.engine.scene.stage.addComponentAndRun(new StageManager());
 	}
 
 }
 
 // start game
-export default new MyGame();
+export default new Jackman();

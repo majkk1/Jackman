@@ -82,7 +82,6 @@ export enum Messages {
 	KEY_TAKE = 'key take',
 	KEY_USE = 'key use',
 
-	ITEMBAR_RESET = 'itembar reset',
 	ITEM_ADD = 'item add',
 
 	REMOVE_INFOBOX = 'remove infobox',

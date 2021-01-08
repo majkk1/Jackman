@@ -3,10 +3,12 @@ import { TEXTURE_SCALE } from '../constants/constants';
 import { Assets, Messages, Tags } from '../constants/enums'
 import { SpritesheetInfo } from '../constants/spritesheet';
 
+/**
+ * This component shows information about taken items in right bottom corner
+ */
 export class ItembarController extends ECS.Component {
 
     items: Map<string, ECS.Sprite> = new Map();
-    firstItemName: Tags;
 
     onInit() {
         this.subscribe(Messages.RUN_LEVEL);
@@ -14,7 +16,6 @@ export class ItembarController extends ECS.Component {
         this.subscribe(Messages.DOUBLE_JUMP_ENABLED);
         this.subscribe(Messages.KEY_TAKE);
         this.subscribe(Messages.KEY_USE)
-        this.subscribe(Messages.ITEMBAR_RESET);
     }
 
     onMessage(msg: ECS.Message) {
@@ -63,6 +64,7 @@ export class ItembarController extends ECS.Component {
             throw Error(`Invalid name of item: ${name}`);
         }
 
+        //create correct sprite
         texture.frame = new PIXI.Rectangle(icon.x, icon.y, icon.width, icon.height);
         let keyCard = new ECS.Sprite('item ' + name, texture);
         keyCard.scale.set(TEXTURE_SCALE * 1.25);
@@ -85,6 +87,7 @@ export class ItembarController extends ECS.Component {
     }
 
     private redrawItems() {
+        //after removed item, redraw items
         let i = 0;
         for (let [tag, sprite] of this.items) {
             sprite.x = this.scene.width - i - 1;

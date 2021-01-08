@@ -1,28 +1,25 @@
-import * as ECS from '../libs/pixi-ecs';
-import { ASSET_RES, INFOBOX_TIMER } from './constants/constants';
-import { Assets, Messages } from './constants/enums'
+import * as ECS from '../../libs/pixi-ecs';
+import { ASSET_RES, INFOBOX_TIMER } from '../constants/constants';
+import { Assets, Messages } from '../constants/enums'
 
+/**
+ * This class should be assigned to Infobox sprite, when player is in collision with infobox.
+ * It prints the text of the infobox.
+ */
 export class InfoboxController extends ECS.Component {
 
-    infoSprite: ECS.Sprite;
     text: ECS.BitmapText;
-
     startTime: number;
-
-    constructor(infoSprite: ECS.Sprite) {
-        super();
-
-        this.infoSprite = infoSprite;
-    }
 
     onInit() {
         this.subscribe(Messages.REMOVE_INFOBOX);
         this.subscribe(Messages.RESET_INFOBOX);
 
-        this.text = new ECS.BitmapText('infobox bitmaptext', this.infoSprite.name, Assets.FONT, 0.5, 0xFFFFFF);
+        //print infobox text
+        this.text = new ECS.BitmapText('infobox bitmaptext', this.owner.asSprite().name, Assets.FONT, 0.5, 0xFFFFFF);
         this.text.scale.set(ASSET_RES);
-        this.text.x = this.infoSprite.x;
-        this.text.y = this.infoSprite.y - ASSET_RES;
+        this.text.x = this.owner.x;
+        this.text.y = this.owner.y - ASSET_RES;
         this.text.anchor = 0.5;
         this.text.zIndex = 20;
 

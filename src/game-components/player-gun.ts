@@ -1,10 +1,12 @@
-import * as ECS from '../libs/pixi-ecs';
-import { Attribute, Assets, Direction, Messages } from './constants/enums'
+import * as ECS from '../../libs/pixi-ecs';
+import { Attribute, Assets, Direction, Messages } from '../constants/enums'
 import { BulletBuilder } from './bullet-builder';
-import { ASSET_RES } from './constants/constants';
-import { TextureChanger } from './texture-changer';
+import { ASSET_RES } from '../constants/constants';
 import { PlayerState } from './player-state-updater';
 
+/**
+ * This component is assgined to the player, where he take a gun. It controls shooting (keyboard input, creating bullet) and also creates texture with gun on player. 
+ */
 export class PlayerGun extends ECS.Component {
 
 	keyInputCmp: ECS.KeyInputComponent;
@@ -24,7 +26,7 @@ export class PlayerGun extends ECS.Component {
 			gunTexture = new PIXI.Texture(gunTexture.baseTexture, gunTexture.frame, null, null, 12);
 		}
 
-		//create gun sprite
+		//create gun sprite on player
 		let gunSprite = new ECS.Sprite('gun sprite',gunTexture);
 		gunSprite.anchor.x = 0.5;
 		gunSprite.x += gunSprite.width/2;
@@ -36,6 +38,7 @@ export class PlayerGun extends ECS.Component {
 		if (this.keyInputCmp.isKeyPressed(ECS.Keys.KEY_CTRL)) {
 			const ammo = this.owner.getAttribute<PlayerState>(Attribute.PLAYER_STATE).ammo;
 			const direction = this.owner.getAttribute(Attribute.DIRECTION) as Direction;
+			//make a bullet
 			if (ammo > 0) {
 				const bullet = new BulletBuilder(direction, this.owner, this.scene);
 				bullet.build();
