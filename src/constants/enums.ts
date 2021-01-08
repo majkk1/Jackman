@@ -17,6 +17,7 @@ export enum BlockType {
     MONSTER = 'MONSTER',
     HEALTH_COIN = 'HEALTH_COIN',
     COIN = 'COIN',
+    FLY = 'FLY',
     DOUBLE_JUMP = 'DOUBLE_JUMP',
     GUN = 'GUN',
     BLUE_GATE = 'BLUE_GATE',
@@ -58,34 +59,36 @@ export enum Layer {
     LEVEL_NAME = "Level Name Layer"
 }
 
+
 export enum Messages {
-    NEW_GAME = "New game",
-    RUN_LEVEL = "Run level",
-    RESTART_LEVEL = 'Restart level',
-    LEVEL_DONE = 'Level done',
-    GAME_RESET = "Game reset",
+	NEW_GAME = "New game",
+	RUN_LEVEL = "Run level",
+	RESTART_LEVEL = 'Restart level',
+	LEVEL_DONE = 'Level done',
+	GAME_RESET = "Game reset",
 
-    HEALTH_ADD = 'Health add',
-    HEALTH_REMOVE = 'Health remove',
-    HEALTH_SET = 'Health set',
-    COIN_ADD = 'coin add',
-    COIN_SET = 'coin set',
+	HEALTH_ADD = 'Health add',
+	HEALTH_REMOVE = 'Health remove',
+	HEALTH_SET = 'Health set',
+	COIN_ADD = 'coin add',
+	COIN_SET = 'coin set',
 
-    GUN_TAKE = 'gun take',
-    AMMO_SET = 'ammo set',
-    GUN_FIRE = 'gun fire',
-    GUN_DROP = 'gun drop',
+	GUN_TAKE = 'gun take',
+	AMMO_SET = 'ammo set',
+	GUN_FIRE = 'gun fire',
+	GUN_DROP = 'gun drop',
 
-    PLAYER_DEAD = 'Player dead',
-    KEY_TAKE = 'key take',
-    KEY_USE = 'key use',
+	PLAYER_DEAD = 'Player dead',
+	KEY_TAKE = 'key take',
+	KEY_USE = 'key use',
 
-    ITEMBAR_RESET = 'itembar reset',
-    ITEM_ADD = 'item add',
+	ITEMBAR_RESET = 'itembar reset',
+	ITEM_ADD = 'item add',
 
-    REMOVE_INFOBOX = 'remove infobox',
-    RESET_INFOBOX = "RESET_INFOBOX",
-    DOUBLE_JUMP_ENABLED = "DOUBLE_JUMP_ENABLED"
+	REMOVE_INFOBOX = 'remove infobox',
+	RESET_INFOBOX = "RESET_INFOBOX",
+	DOUBLE_JUMP_ENABLED = "DOUBLE_JUMP_ENABLED",
+	FLY_ENABLED = "FLY_ENABLED"
 }
 
 export enum PlayerMoveState {
@@ -102,7 +105,9 @@ export enum Tags {
     POWERUP = 'powerup',
     HEALTH_COIN = 'health coin',
     COIN = 'coin',
+    FLY = 'fly',
     DOUBLE_JUMP = 'double jump',
+    FLY_ENABLED = 'fly',
     GUN = 'gun',
     KEY = 'key',
     GATE = 'gate',

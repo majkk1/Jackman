@@ -10,6 +10,7 @@ export class ItembarController extends ECS.Component {
 
     onInit() {
         this.subscribe(Messages.RUN_LEVEL);
+        this.subscribe(Messages.FLY_ENABLED);
         this.subscribe(Messages.DOUBLE_JUMP_ENABLED);
         this.subscribe(Messages.KEY_TAKE);
         this.subscribe(Messages.KEY_USE)
@@ -20,6 +21,10 @@ export class ItembarController extends ECS.Component {
         switch (msg.action) {
             case Messages.DOUBLE_JUMP_ENABLED:
                 this.addItem(Tags.DOUBLE_JUMP);
+                break;
+
+            case Messages.FLY_ENABLED:
+                this.addItem(Tags.FLY);
                 break;
 
             case Messages.KEY_TAKE:
@@ -47,6 +52,9 @@ export class ItembarController extends ECS.Component {
         }
         else if (name === Tags.GREEN) {
             icon = SpritesheetInfo.GREEN_KEY_ICON;
+        }
+        else if (name === Tags.FLY) {
+            icon = SpritesheetInfo.FLY;
         }
         else if (name === Tags.DOUBLE_JUMP) {
             icon = SpritesheetInfo.DOUBLE_JUMP;

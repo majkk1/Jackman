@@ -3,6 +3,7 @@ export const SpritesheetInfo = {
     "WALL" :           { x: 32,  y: 0,  width: 32, height: 32 },
     "HEALTH_COIN" :    { x: 128, y: 0,  width: 32, height: 32 },
     "COIN" :           { x: 160, y: 0,  width: 32, height: 32 },
+    "FLY" :            { x: 64 , y: 32, width: 32, height: 32 },
     "DOUBLE_JUMP" :    { x: 96 , y: 32, width: 32, height: 32 },
     "GUN" :            { x: 192, y: 0,  width: 32, height: 32 },
     "BLUE_GATE" :      { x: 0,   y: 64, width: 32, height: 32 },

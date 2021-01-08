@@ -14,13 +14,21 @@ export class PlayerController extends ECS.Component {
 	speed: Vector2 = new Vector2(0, 0);
 	direction: Direction;
 
-	//for double jump powerup
+	playerJumpSize: number = PLAYER_JUMP_SIZE;
+	gravity: number = GRAVITY;
+
+	//double jump powerup
 	doubleJumpEnabled: boolean = false;
 	secondJumpPossible: boolean = false;
 	jumpInRow: number = 0;
 
+	//fly powerup
+	flyEnabled: boolean = false;
+
+
 	onInit() {
 		this.subscribe(Messages.DOUBLE_JUMP_ENABLED);
+		this.subscribe(Messages.FLY_ENABLED);
 	}
 
 	//if poweup affecting physics is taken, apply it
@@ -28,6 +36,13 @@ export class PlayerController extends ECS.Component {
 		switch (msg.action) {
 			case Messages.DOUBLE_JUMP_ENABLED:
 				this.doubleJumpEnabled = true;
+				break;
+		}
+		switch (msg.action) {
+			case Messages.FLY_ENABLED:
+				this.flyEnabled = true;
+				this.playerJumpSize /= 2;
+				this.gravity /= 2;
 				break;
 		}
 	}
@@ -42,8 +57,8 @@ export class PlayerController extends ECS.Component {
 		//add gravity (if not on ground or not going up)
 		if ((!this.isOnGround || this.speed.x != 0) && !this.inJump) {
 			this.isOnGround = false;
-			this.speed.y += GRAVITY * deltaMul;
-			this.speed.y = Math.min(this.speed.y, GRAVITY);
+			this.speed.y += this.gravity * deltaMul;
+			this.speed.y = Math.min(this.speed.y, this.gravity);
 		}
 
 		//apply physics on player
@@ -111,10 +126,10 @@ export class PlayerController extends ECS.Component {
 					}
 
 					// first stage of jump - add speed, remove gravity
-					if ((this.isOnGround && !this.inJump) || (this.doubleJumpEnabled && this.secondJumpPossible)) {
+					if ((this.isOnGround && !this.inJump) || (this.doubleJumpEnabled && this.secondJumpPossible) || this.flyEnabled) {
 						this.inJump = true;
 						this.oldY = this.owner.y;
-						this.speed.y = -PLAYER_JUMP_SIZE;
+						this.speed.y = -this.playerJumpSize;
 						this.isOnGround = false;
 						this.secondJumpPossible = false;
 						this.jumpInRow++;

@@ -85,6 +85,10 @@ export class PlayerCollision extends ECS.Component {
                 this.sendMessage(Messages.COIN_ADD);
                 collider.destroy();
             }
+            else if (collider.hasTag(Tags.FLY)) {
+                this.sendMessage(Messages.FLY_ENABLED);
+                collider.destroy();
+            }
             else if (collider.hasTag(Tags.DOUBLE_JUMP)) {
                 this.sendMessage(Messages.DOUBLE_JUMP_ENABLED);
                 collider.destroy();
